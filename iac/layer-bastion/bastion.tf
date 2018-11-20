@@ -29,6 +29,7 @@ resource "google_compute_instance" "bastion-europe-1b" {
   name         = "bastion-europe-1b"
   machine_type = "n1-standard-1"
   zone         = "${var.region}-b"
+  allow_stopping_for_update = true
 
   tags = ["bastion", "public"]
 
@@ -36,10 +37,6 @@ resource "google_compute_instance" "bastion-europe-1b" {
     initialize_params {
       image = "debian-cloud/debian-9"
     }
-  }
-
-  // Local SSD disk
-  scratch_disk {
   }
 
   network_interface {
@@ -56,7 +53,10 @@ resource "google_compute_instance" "bastion-europe-1b" {
     ssh-keys = "admin:${file("~/.ssh/id_rsa.pub")}"
   }
 
+  metadata_startup_script = "${file("${path.cwd}/install-vm.sh")}"
+
   service_account {
-    scopes = ["https://www.googleapis.com/auth/cloud-platform", "compute-rw", "storage-rw"]
+    email = "bastion-sa@slavayssiere-sandbox.iam.gserviceaccount.com"
+    scopes = ["cloud-platform", "compute-rw", "storage-rw"]
   }
 }

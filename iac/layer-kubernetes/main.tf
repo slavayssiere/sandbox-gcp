@@ -23,7 +23,7 @@ terraform {
 }
 
 data "terraform_remote_state" "layer-base" {
-  backend = "gcp"
+  backend = "gcs"
   config {
     bucket  = "tf-slavayssiere-wescale"
     prefix  = "terraform/layer-base"

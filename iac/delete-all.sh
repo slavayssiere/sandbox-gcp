@@ -1,11 +1,13 @@
 #!/bin/bash
 
 cd layer-kubernetes
-terraform destroy
+terraform destroy \
+    -auto-approve
 cd -
 
 cd layer-bastion
-terraform destroy
+terraform destroy \
+    -auto-approve
 cd -
 
 cd layer-base

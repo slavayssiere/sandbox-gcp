@@ -7,13 +7,14 @@ gcloud config set project slavayssiere-sandbox
 gcloud config set compute/region $REGION
 
 terraform apply \
-    --var "region=europe-west1"
+    --var "region=europe-west1" \
+    -auto-approve
 
-gcloud beta compute routers create nat-$REGION  \
+gcloud -q beta compute routers create nat-$REGION  \
     --network demo-net \
     --region $REGION
 
-gcloud beta compute routers nats create nat-$REGION \
+gcloud -q beta compute routers nats create nat-$REGION \
     --router-region $REGION \
     --router nat-$REGION \
     --nat-all-subnet-ip-ranges \
