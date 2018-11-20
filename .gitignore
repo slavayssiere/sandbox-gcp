@@ -1,0 +1,3 @@
+iac/layer-base/.terraform
+iac/layer-bastion/.terraform
+iac/layer-kubernetes/.terraform

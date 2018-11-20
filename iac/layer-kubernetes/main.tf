@@ -19,7 +19,6 @@ terraform {
   backend "gcs" {
     bucket  = "tf-slavayssiere-wescale"
     prefix  = "terraform/layer-kubernetes"
-    region = "${var.region}"
   }
 }
 
