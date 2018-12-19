@@ -1,0 +1,155 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: grafana
+        kind: dashboard
+    spec:
+      tolerations:
+      - key: dedicated
+        operator: Equal
+        value: monitoring
+        effect: NoExecute  
+      containers:
+      - name: grafana
+        image: grafana/grafana:5.2.1
+        ports:
+        - containerPort: 3000
+        env:
+        - name: GF_SERVER_ROOT_URL
+          value: /grafana
+        volumeMounts:
+        - name: grafana-data
+          mountPath: /var/lib/grafana
+          readOnly: false
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: grafana-dashboards
+          readOnly: false
+        - mountPath: /grafana-dashboard-definitions/0
+          name: grafana-dashboard-definitions
+          readOnly: false
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 2G
+          requests:
+            cpu: 1000m
+            memory: 500M
+      nodeSelector:
+        dedicated: monitoring
+      securityContext:
+        fsGroup: 65534
+      volumes:
+      - name: grafana-data
+        persistentVolumeClaim:
+          claimName: grafana-pvc
+      - name: grafana-datasources
+        configMap:
+          name: grafana-datasources
+      - configMap:
+          name: grafana-dashboards
+        name: grafana-dashboards
+      - configMap:
+          name: grafana-dashboard-definitions
+        name: grafana-dashboard-definitions
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: monitoring
+  labels:
+    app: grafana
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-service
+  namespace: monitoring
+spec:
+  ports:
+    - port: 3000 
+      targetPort: 3000
+      name: grafana-port 
+  selector:
+    app: grafana
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: grafana-ui
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /grafana
+        backend:
+          serviceName: grafana-service
+          servicePort: 3000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+data:
+  prometheus.yaml: |-
+    {
+        "datasources": [
+            {
+                "access": "proxy",
+                "etitable": false,
+                "name": "prometheus-k8s",
+                "org_id": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-k8s:9090",
+                "version": 1
+            },
+            {
+                "access": "proxy",
+                "etitable": false,
+                "name": "prometheus-injectors",
+                "org_id": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-injectors:9090",
+                "version": 1
+            },
+            {
+                "access": "proxy",
+                "etitable": false,
+                "name": "prometheus-consumers",
+                "org_id": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-consumers:9090",
+                "version": 1
+            },
+            {
+                "access": "proxy",
+                "etitable": false,
+                "name": "prometheus-bigtable",
+                "org_id": 1,
+                "type": "prometheus",
+                "url": "http://prometheus-bigtable:9090",
+                "version": 1
+            }
+        ]
+    }

@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-injectors
+  namespace: monitoring
+  labels:
+    name: prometheus-injectors
+spec:
+  selector:
+    app: prometheus-injectors
+  ports:
+  - name: prometheus-injectors
+    protocol: TCP
+    port: 9090
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-injectors-pvc
+  namespace: monitoring
+  labels:
+    app: prometheus-injectors
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: prometheus-injectors
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus-injectors
+  template:
+    metadata:
+      name: prometheus-injectors
+      labels:
+        app: prometheus-injectors
+    spec:
+      serviceAccountName: prometheus
+      tolerations:
+      - key: dedicated
+        operator: Equal
+        value: monitoring
+        effect: NoExecute  
+      containers:
+      - name: prometheus-injectors
+        image: quay.io/prometheus/prometheus:v2.3.2
+        args:
+          - '--config.file=/etc/prometheus/prometheus.yml'
+          - '--web.external-url=/prometheus-injectors'
+          - '--storage.tsdb.path=/prometheus/data'
+          - "--storage.tsdb.retention=10d"
+          - '--web.route-prefix=/'
+        ports:
+        - name: web
+          containerPort: 9090
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/prometheus
+        - name: prometheus-injectors-data
+          mountPath: /prometheus
+      nodeSelector:
+        dedicated: monitoring
+      securityContext:
+        fsGroup: 65534
+      volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus-injectors
+      - name: prometheus-injectors-data
+        persistentVolumeClaim:
+          claimName: prometheus-injectors-pvc
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-injectors
+  namespace: monitoring
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 5s
+      evaluation_interval: 5s
+
+    scrape_configs:
+      
+      - job_name: 'kubernetes-pods'
+
+        kubernetes_sd_configs:
+        - role: pod
+
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_injector]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: kubernetes_pod_name
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: prometheus-injectors-ui
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /prometheus-injectors
+        backend:
+          serviceName: prometheus-injectors
+          servicePort: 9090

@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigtable-load-deployment
+  labels:
+    app: bigtable-load-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bigtable-load-deployment
+  template:
+    metadata:
+      labels:
+        app: bigtable-load-deployment
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '8080'
+        prometheus.io/bigtable: 'true'
+    spec:
+      containers:
+      - name: my-bigtable-load
+        image: eu.gcr.io/cool-wharf-207907/kaiko-bigtable-load:0.14
+        imagePullPolicy: Always
+        env:
+        - name: SUB_NAME
+          value: "projects/cool-wharf-207907/subscriptions/trade_subcription"
+        - name: PROJECT_ID
+          value: "cool-wharf-207907"
+        - name: INSTANCE_ID
+          value: "bt-instance-test"
+        - name: TABLE_ID
+          value: "my-table"
+        - name: PROM_PORT
+          value: "8080"
+        resources:
+          requests:
+            memory: 20M
+            cpu: 10m
+          limits:
+            memory: 20M
+            cpu: 10m
+        volumeMounts:
+          - name: secret-sa
+            mountPath: "/secret"
+            readOnly: true
+      volumes:
+      - name: secret-sa
+        secret:
+          secretName: sa-gcp-pubsub
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bigtable-load-pubsub-hpa
+spec:
+  minReplicas: 100
+  maxReplicas: 5000
+  metrics:
+  - external:
+      metricName: pubsub.googleapis.com|subscription|num_undelivered_messages
+      metricSelector:
+        matchLabels:
+          resource.labels.subscription_id: trade_subcription
+      targetAverageValue: "10"
+    type: External
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: bigtable-load-deployment
