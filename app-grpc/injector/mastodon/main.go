@@ -68,6 +68,9 @@ func publishmessage(maStatus *mastodon.Status, client pubsub.PublisherClient, pu
 }
 
 func main() {
+
+	flag.Parse()
+
 	// Client
 	clientPub := connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	clientMastodon := mastodon.NewClient(&mastodon.Config{
@@ -82,16 +85,15 @@ func main() {
 	}
 
 	// Prometheus
-	// histogramMean := PromHistogramVec()
+	histogramMean := PromHistogramVec()
 	// messagesCounter := PromCounterVec()
 	publishTime := make(chan int64)
-	// println("Launch mean calculation thread")
-	// go func() {
-	// 	for {
-	// 		elapsed := <-publishTime
-	// 		histogramMean.WithLabelValues(os.Getenv("MESSAGE_SIZE"), os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
-	// 	}
-	// }()
+	go func() {
+		for {
+			elapsed := <-publishTime
+			histogramMean.WithLabelValues(os.Getenv("MESSAGE_SIZE"), os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
+		}
+	}()
 
 	timeline, err := clientMastodon.StreamingHashtag(context.Background(), os.Getenv("HASHTAG"), false)
 	if err != nil {
@@ -106,19 +108,11 @@ func main() {
 		}
 	}()
 
-	flag.Parse()
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
 
-	// graceful
-	var gracefulStop = make(chan os.Signal)
-	signal.Notify(gracefulStop, syscall.SIGTERM)
-	signal.Notify(gracefulStop, syscall.SIGINT)
-	go func() {
-		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v", sig)
-		fmt.Println("Wait for 1 second to finish processing")
-		time.Sleep(1 * time.Second)
-		os.Exit(0)
-	}()
+	// Wait for SIGINT and SIGTERM (HIT CTRL-C)
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Println(<-ch)
 }
