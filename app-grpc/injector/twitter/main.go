@@ -28,6 +28,7 @@ var (
 	consumerSecret = flag.String("consumer-secret", os.Getenv("CONSUMER_SECRET"), "Twitter Consumer Secret")
 	accessToken    = flag.String("access-token", os.Getenv("ACCESS_TOKEN"), "Twitter Access Token")
 	accessSecret   = flag.String("access-secret", os.Getenv("ACCESS_SECRET"), "Twitter Access Secret")
+	hashtag        = flag.String("hashtag", os.Getenv("HASHTAG"), "Twitter hashtag")
 )
 
 func connexionPublisher(address string, filename string, scope ...string) pubsub.PublisherClient {
@@ -52,7 +53,7 @@ func publishmessage(tweet *twitter.Tweet, client pubsub.PublisherClient, publish
 	start := time.Now()
 	ctx := context.Background()
 
-	message.Data = []byte(tweet.FullText)
+	message.Data = []byte(tweet.Text)
 	message.Attributes = make(map[string]string)
 	message.Attributes["source"] = "twitter"
 	message.Attributes["time"] = strconv.FormatInt(start.UnixNano(), 10)
@@ -72,46 +73,48 @@ func publishmessage(tweet *twitter.Tweet, client pubsub.PublisherClient, publish
 }
 
 func main() {
+
+	flag.Parse()
+
 	// Client
 	clientPub := connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	clientTwitter := NewTwitter(consumerKey, consumerSecret, accessToken, accessSecret)
 
 	// Prometheus
-	// histogramMean := PromHistogramVec()
+	histogramMean := PromHistogramVec()
 	// messagesCounter := PromCounterVec()
 	publishTime := make(chan int64)
-	// println("Launch mean calculation thread")
-	// go func() {
-	// 	for {
-	// 		elapsed := <-publishTime
-	// 		histogramMean.WithLabelValues(os.Getenv("MESSAGE_SIZE"), os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
-	// 	}
-	// }()
+	go func() {
+		for {
+			elapsed := <-publishTime
+			histogramMean.WithLabelValues(os.Getenv("MESSAGE_SIZE"), os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
+		}
+	}()
 
-	// Convenience Demux demultiplexed stream messages
 	demux := twitter.NewSwitchDemux()
+
 	demux.Tweet = func(tweet *twitter.Tweet) {
+		// startTime := time.Now()
+		fmt.Println(tweet.Text)
 		publishmessage(tweet, clientPub, publishTime)
+		// messagesCounter.WithLabelValues(len(tweet.Text), os.Getenv("TOPIC_NAME")).Add(1)
+		// elapsedTime := time.Sine(startTime)
+		// time.Sleep((1000 * time.Millisecond) - (elapsedTime / time.Millisecond))
 	}
 
-	log.Println("Starting Stream...")
+	stream := clientTwitter.FilterTwitter(*hashtag)
 
-	streamTwitter := clientTwitter.FilterTwitter()
-	go demux.HandleChan(streamTwitter.Messages)
+	// Receive messages until stopped or stream quits
+	go demux.HandleChan(stream.Messages)
 
-	flag.Parse()
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
 
-	// graceful
-	var gracefulStop = make(chan os.Signal)
-	signal.Notify(gracefulStop, syscall.SIGTERM)
-	signal.Notify(gracefulStop, syscall.SIGINT)
-	go func() {
-		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v", sig)
-		fmt.Println("Wait for 1 second to finish processing")
-		time.Sleep(1 * time.Second)
-		os.Exit(0)
-	}()
+	// Wait for SIGINT and SIGTERM (HIT CTRL-C)
+	ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
+	log.Println(<-ch)
+
+	fmt.Println("Stopping Stream...")
+	stream.Stop()
 }

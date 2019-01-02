@@ -23,11 +23,11 @@ func NewTwitter(consumerKey, consumerSecret, accessToken, accessSecret *string) 
 	return TwitterClient{Client: twitter.NewClient(httpClient)}
 }
 
-func (twitterClient TwitterClient) FilterTwitter() *twitter.Stream {
+func (twitterClient TwitterClient) FilterTwitter(hashtag string) *twitter.Stream {
 	log.Println("Starting Stream...")
 
 	filterParams := &twitter.StreamFilterParams{
-		Track:         twitterClient.Filter,
+		Track:         []string{hashtag},
 		StallWarnings: twitter.Bool(true),
 	}
 	stream, err := twitterClient.Client.Streams.Filter(filterParams)
