@@ -17,7 +17,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
+	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
@@ -93,8 +93,7 @@ func publishmessage(mess *pubsub.PubsubMessage, client pubsub.PublisherClient) {
 
 func createEntry(starttime int64) *Entry {
 	entry := Entry{
-		// random time between 2017-01-01 and 2018-01-01 in 100 ms intervals
-		EntryTime:  1483228800000 + rand.Int63n(3153600000),
+		EntryTime:  time.Now().UnixNano(),
 		ID:         strconv.Itoa(rand.Int()),
 		Datasource: os.Getenv("TOPIC_NAME"),
 		Field1:     rand.Int63n(1000),
@@ -172,7 +171,7 @@ func sendMessage(client pubsub.PublisherClient, entryStream chan *Entry) {
 
 func main() {
 
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 	clientPub := connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	clientSub := connexionSubcriber("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 

@@ -14,7 +14,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
+	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
@@ -22,7 +22,7 @@ import (
 	"context"
 )
 
-var addr = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
+var addr = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
 
 func connexionSubcriber(address string, filename string, scope ...string) pubsub.SubscriberClient {
 	pool, _ := x509.SystemCertPool()
@@ -62,7 +62,10 @@ func consumemessage(client pubsub.SubscriberClient) {
 			for _, messRec := range resp.ReceivedMessages {
 				ackMess.AckIds = append(ackMess.AckIds, messRec.GetAckId())
 				mess := messRec.GetMessage()
+				fmt.Println(mess.Attributes["time"])
+
 				if starttime, err := strconv.ParseInt(mess.Attributes["time"], 10, 64); err != nil {
+
 					fmt.Println(err)
 				} else {
 					var elapsedTime float64
@@ -70,6 +73,7 @@ func consumemessage(client pubsub.SubscriberClient) {
 					histogram.WithLabelValues("complete_time").Observe(elapsedTime)
 				}
 				if starttime, err := strconv.ParseInt(mess.Attributes["time_normalize"], 10, 64); err != nil {
+					fmt.Println("toto")
 					fmt.Println(err)
 				} else {
 					var elapsedTime float64
