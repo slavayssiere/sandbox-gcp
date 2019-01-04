@@ -14,3 +14,12 @@ VOLUME /secret
 WORKDIR /app
 COPY --from=build-env /src/goapp /app/
 ENTRYPOINT ./goapp
+
+# Localy do:
+# export SUB_NAME="projects/sandbox-perrier/subscriptions/raw-normalizer"
+# export SECRET_PATH="/Users/perriea/Downloads/sandbox-perrier-9d47bea05833.json"
+# export TOPIC_NAME="projects/sandbox-perrier/topics/raw-twitter"
+# export PROM_PORT=8080
+
+# docker build . -t wescale/consumer:1.0
+# docker run -d -v $HOME/Downloads/sandbox-perrier-9d47bea05833.json:/secret/secret-sa-gcp-pubsub.json --env-file .env wescale/consumer:1.0

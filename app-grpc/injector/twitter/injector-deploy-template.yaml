@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: injector-deployment-name
+  labels:
+    app: injector-deployment-name
+spec:
+  replicas: REPLICAS
+  selector:
+    matchLabels:
+      app: injector-deployment-name
+  template:
+    metadata:
+      labels:
+        app: injector-deployment-name
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/injector: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '8080'
+    spec:
+      containers:
+      - name: my-injector
+        image: eu.gcr.io/cool-wharf-207907/kaiko-injector:0.0.18
+        imagePullPolicy: Always
+        env:
+        - name: MESSAGE_SIZE
+          value: "MESSAGE_SIZE_TPL"
+        - name: FREQUENCY_PER_SECOND
+          value: "FREQUENCY_PER_SECOND_TPL"
+        - name: TOPIC_NAME
+          value: "name_topic"
+        resources:
+          requests:
+            memory: 80M
+            cpu: 500m
+          limits:
+            memory: 80M
+            cpu: 500m
+        volumeMounts:
+          - name: secret-sa
+            mountPath: "/secret"
+            readOnly: true
+      volumes:
+      - name: secret-sa
+        secret:
+          secretName: sa-gcp-pubsub
