@@ -1,27 +1,35 @@
-FROM golang:alpine AS build-env
-RUN apk add --no-cache git
-ADD . /src
-RUN cd /src && go build -o goapp
+FROM golang:1.11-alpine AS build-env
+RUN apk add --no-cache bash ca-certificates git gcc g++ libc-dev git
+RUN mkdir -p $GOPATH/src/app
+ENV GO111MODULE=on
+WORKDIR $GOPATH/src/app
+COPY src/go.mod .
+COPY src/go.sum .
+RUN go mod download
+
+FROM build-env AS build-stage
+WORKDIR $GOPATH/src/app
+COPY src .
+RUN go install
 
 # final stage
 FROM alpine
-RUN apk add --no-cache --update ca-certificates
+RUN apk add --no-cache curl ca-certificates
 VOLUME /secret
 ENV PROM_PORT 8080
 ENV MESSAGE_SIZE 1024 
 ENV TOPIC_NAME "projects/sandbox-perrier/topics/raw-mastodon"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
-WORKDIR /app
-COPY --from=build-env /src/goapp /app/
-ENTRYPOINT ./goapp
 
-# Localy do:
-# export TOPIC_NAME="projects/sandbox-perrier/topics/raw-mastodon"
-# export CLIENT_ID=""
-# export CLIENT_SECRET=""
-# export SERVER="https://linuxrocks.online"
-# export HASHTAG=""
-# export SECRET_PATH="/Users/perriea/Downloads/sandbox-perrier-9d47bea05833.json"
-# export PROM_PORT=8080
-# export LOGIN=""
-# export PASSWORD=""
+ENV CLIENT_ID "default"
+ENV CLIENT_SECRET "default"
+ENV SERVER "https://linuxrocks.online"
+ENV LOGIN "default"
+ENV PASSWORD "default"
+ENV HASHTAG "#CAC40"
+
+WORKDIR /app
+COPY --from=build-stage /go/bin/mastodon /app/
+HEALTHCHECK --interval=5s --retries=3 --timeout=5s CMD curl -f http://localhost:8080/healthz || exit 1
+ENTRYPOINT ./mastodon
+EXPOSE 8080
