@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: traefik-ingress-service
   namespace: kube-system
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: public.gcp-wescale.slavayssiere.fr
   labels:
     k8s-app: traefik-ingress-lb
 spec:

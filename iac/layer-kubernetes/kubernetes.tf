@@ -42,12 +42,15 @@ resource "google_container_cluster" "test-cluster" {
 }
 
 resource "google_container_node_pool" "np-default" {
+  provider   = "google-beta"
   name       = "np-default"
   region     = "${var.region}"
-  cluster    = "${google_container_cluster.primary.name}"
+  cluster    = "${google_container_cluster.test-cluster.name}"
   node_count = 3
 
   node_config {
+    machine_type = "n1-standard-4"
+
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.read_only",
