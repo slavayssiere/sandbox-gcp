@@ -18,7 +18,7 @@ resource "google_service_account_key" "pubsubkey" {
 
 data "google_iam_policy" "kubernetes-admin" {
   binding {
-    role = "roles/pubsub.editor"
+    role    = "roles/pubsub.editor"
     members = ["serviceAccount:pubsub-rw@slavayssiere-sandbox.iam.gserviceaccount.com"]
   }
 }

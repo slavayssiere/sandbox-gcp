@@ -4,3 +4,6 @@ iac/layer-kubernetes/.terraform
 app-grpc/iac/secret-sa-gcp-pubsub.json
 env.sh
 .vscode
+iac/layer-kubernetes/certs/ca.crt
+iac/layer-kubernetes/certs/client.crt
+iac/layer-kubernetes/certs/client.key

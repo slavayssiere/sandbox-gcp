@@ -1,5 +1,5 @@
 resource "google_compute_network" "demo-net" {
-  name       = "demo-net"
+  name                    = "demo-net"
   auto_create_subnetworks = false
 }
 

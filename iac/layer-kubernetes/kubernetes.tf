@@ -5,13 +5,20 @@ resource "google_container_cluster" "test-cluster" {
   initial_node_count = 1
 
   private_cluster_config {
-    enable_private_endpoint = true
+    enable_private_endpoint = false
     enable_private_nodes    = true
-    master_ipv4_cidr_block = "192.168.16.0/28"
+    master_ipv4_cidr_block  = "192.168.16.0/28"
   }
 
-  min_master_version = "1.11.2-gke.18"
-  node_version       = "1.11.2-gke.18"
+  master_authorized_networks_config {
+    cidr_blocks {
+      cidr_block   = "195.81.225.200/32"
+      display_name = "routard.com"
+    }
+  }
+
+  min_master_version = "1.11.5-gke.5"
+  node_version       = "1.11.5-gke.5"
 
   network    = "demo-net"
   subnetwork = "demo-subnet"
@@ -27,6 +34,19 @@ resource "google_container_cluster" "test-cluster" {
     services_secondary_range_name = "c0-services"
   }
 
+  remove_default_node_pool = true
+
+  node_pool {
+    name = "np-default"
+  }
+}
+
+resource "google_container_node_pool" "np-default" {
+  name       = "np-default"
+  region     = "${var.region}"
+  cluster    = "${google_container_cluster.primary.name}"
+  node_count = 3
+
   node_config {
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
@@ -41,4 +61,23 @@ resource "google_container_cluster" "test-cluster" {
 
     tags = ["kubernetes", "test-cluster"]
   }
+}
+
+resource "local_file" "client_certificate" {
+  content  = "${google_container_cluster.test-cluster.master_auth.0.client_certificate}"
+  filename = "${path.cwd}/certs/client.crt"
+}
+
+resource "local_file" "client_key" {
+  content  = "${google_container_cluster.test-cluster.master_auth.0.client_key}"
+  filename = "${path.cwd}/certs/client.key"
+}
+
+resource "local_file" "cluster_ca_certificate" {
+  content  = "${google_container_cluster.test-cluster.master_auth.0.cluster_ca_certificate}"
+  filename = "${path.cwd}/certs/ca.crt"
+}
+
+output "cluster-endpoint" {
+  value = "${google_container_cluster.test-cluster.endpoint}"
 }

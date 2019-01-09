@@ -37,7 +37,7 @@ resource "google_service_account" "bastion-sa" {
 
 resource "google_service_account_iam_binding" "admin-account-iam" {
   service_account_id = "${google_service_account.bastion-sa.name}"
-  role        = "projects/slavayssiere-sandbox/roles/admin_kubernetes_bastion"
+  role               = "projects/slavayssiere-sandbox/roles/admin_kubernetes_bastion"
 
   members = [
     "serviceAccount:bastion-sa@slavayssiere-sandbox.iam.gserviceaccount.com",

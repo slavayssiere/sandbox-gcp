@@ -11,7 +11,7 @@ resource "google_compute_firewall" "training_fw_rules" {
 }
 
 data "google_dns_managed_zone" "gcp-wescale" {
-  name        = "gcp-wescale"
+  name = "gcp-wescale"
 }
 
 resource "google_dns_record_set" "bastion" {
@@ -24,11 +24,10 @@ resource "google_dns_record_set" "bastion" {
   rrdatas = ["${google_compute_instance.bastion-europe-1b.network_interface.0.access_config.0.nat_ip}"]
 }
 
-
 resource "google_compute_instance" "bastion-europe-1b" {
-  name         = "bastion-europe-1b"
-  machine_type = "n1-standard-1"
-  zone         = "${var.region}-b"
+  name                      = "bastion-europe-1b"
+  machine_type              = "n1-standard-1"
+  zone                      = "${var.region}-b"
   allow_stopping_for_update = true
 
   tags = ["bastion", "public"]
@@ -49,14 +48,14 @@ resource "google_compute_instance" "bastion-europe-1b" {
   }
 
   metadata {
-    Name = "bastion"
+    Name     = "bastion"
     ssh-keys = "admin:${file("~/.ssh/id_rsa.pub")}"
   }
 
   metadata_startup_script = "${file("${path.cwd}/install-vm.sh")}"
 
   service_account {
-    email = "bastion-sa@slavayssiere-sandbox.iam.gserviceaccount.com"
+    email  = "bastion-sa@slavayssiere-sandbox.iam.gserviceaccount.com"
     scopes = ["cloud-platform", "compute-rw", "storage-rw"]
   }
 }
