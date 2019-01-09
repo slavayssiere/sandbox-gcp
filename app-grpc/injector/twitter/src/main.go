@@ -78,10 +78,10 @@ func main() {
 
 	// Client
 	clientPub := connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
-	clientTwitter := NewTwitter(consumerKey, consumerSecret, accessToken, accessSecret)
+	clientTwitter := newTwitter(consumerKey, consumerSecret, accessToken, accessSecret)
 
 	// Prometheus
-	histogramMean := PromHistogramVec()
+	histogramMean := promHistogramVec()
 	// messagesCounter := PromCounterVec()
 	publishTime := make(chan int64)
 	go func() {
@@ -102,7 +102,7 @@ func main() {
 		// time.Sleep((1000 * time.Millisecond) - (elapsedTime / time.Millisecond))
 	}
 
-	stream := clientTwitter.FilterTwitter(*hashtag)
+	stream := clientTwitter.filterTwitter(*hashtag)
 
 	// Receive messages until stopped or stream quits
 	go demux.HandleChan(stream.Messages)

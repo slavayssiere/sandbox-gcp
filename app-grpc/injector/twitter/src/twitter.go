@@ -7,12 +7,12 @@ import (
 	"github.com/dghubble/oauth1"
 )
 
-type TwitterClient struct {
+type twitterClient struct {
 	Client *twitter.Client
 	Filter []string
 }
 
-func NewTwitter(consumerKey, consumerSecret, accessToken, accessSecret *string) TwitterClient {
+func newTwitter(consumerKey, consumerSecret, accessToken, accessSecret *string) twitterClient {
 	config := oauth1.NewConfig(*consumerKey, *consumerSecret)
 	token := oauth1.NewToken(*accessToken, *accessSecret)
 
@@ -20,10 +20,10 @@ func NewTwitter(consumerKey, consumerSecret, accessToken, accessSecret *string) 
 	httpClient := config.Client(oauth1.NoContext, token)
 
 	// Twitter Client
-	return TwitterClient{Client: twitter.NewClient(httpClient)}
+	return twitterClient{Client: twitter.NewClient(httpClient)}
 }
 
-func (twitterClient TwitterClient) FilterTwitter(hashtag string) *twitter.Stream {
+func (twitterClient twitterClient) filterTwitter(hashtag string) *twitter.Stream {
 	log.Println("Starting Stream...")
 
 	filterParams := &twitter.StreamFilterParams{

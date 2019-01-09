@@ -2,7 +2,7 @@ package main
 
 import "github.com/prometheus/client_golang/prometheus"
 
-func PromHistogramVec() *prometheus.HistogramVec {
+func promHistogramVec() *prometheus.HistogramVec {
 	histogramMean := prometheus.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Name: "mean_in_injector",
@@ -16,7 +16,7 @@ func PromHistogramVec() *prometheus.HistogramVec {
 	return histogramMean
 }
 
-func PromCounterVec() *prometheus.CounterVec {
+func promCounterVec() *prometheus.CounterVec {
 	messagesCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "messages_injected",
