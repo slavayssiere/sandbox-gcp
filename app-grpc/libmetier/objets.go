@@ -1,4 +1,4 @@
-package main
+package libmetier
 
 // MessageSocial a common social msg
 type MessageSocial struct {
