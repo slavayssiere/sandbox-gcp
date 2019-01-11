@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-sse-deploy
+  namespace: consumers
+  labels:
+    app: app-sse-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-sse-deploy
+  template:
+    metadata:
+      labels:
+        app: app-sse-deploy
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '8080'
+        prometheus.io/normalizer: 'true'
+    spec:
+      containers:
+      - name: app
+        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.1
+        imagePullPolicy: Always
+        env:
+        - name: SUB_NAME 
+          value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub"
+        - name: SECRET_PATH
+          value: "/secret/sa-pubsub-subscriber.json"
+        resources:
+          requests:
+            memory: 20M
+            cpu: 10m
+          limits:
+            memory: 20M
+            cpu: 10m
+        volumeMounts:
+          - name: secret-sa
+            mountPath: "/secret"
+            readOnly: true
+      terminationGracePeriodSeconds: 15
+      volumes:
+      - name: secret-sa
+        secret:
+          secretName: sa-pubsub-subscriber
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app-sse-hpa
+  namespace: consumers
+spec:
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - external:
+      metricName: pubsub.googleapis.com|subscription|num_undelivered_messages
+      metricSelector:
+        matchLabels:
+          resource.labels.subscription_id: "messages-normalized-sub"
+      targetAverageValue: "10"
+    type: External
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app-sse-deploy
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-sse-ing
+  namespace: consumers
+  annotations:
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+  labels:
+    traffic-type: external
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: grafana
+          servicePort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-sse-svc
+  namespace: consumers
+  labels:
+    k8s-app: app-sse-svc
+spec:
+  selector:
+    app: app-sse-deploy
+  ports:
+    - protocol: TCP
+      port: 8080
+    
