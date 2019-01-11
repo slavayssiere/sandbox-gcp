@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: injector-deployment-name
+  name: injector-twitter-deploy
   labels:
-    app: injector-deployment-name
+    app: injector-twitter-deploy
 spec:
   replicas: REPLICAS
   selector:
     matchLabels:
-      app: injector-deployment-name
+      app: injector-twitter-deploy
   template:
     metadata:
       labels:
-        app: injector-deployment-name
+        app: injector-twitter-deploy
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/injector: 'true'

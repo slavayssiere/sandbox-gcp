@@ -33,10 +33,12 @@ resource "google_container_cluster" "test-cluster" {
     services_secondary_range_name = "c0-services"
   }
 
-  remove_default_node_pool = true
+  lifecycle {
+    ignore_changes = ["node_pool"]
+  }
 
   node_pool {
-    name = "np-default"
+    name = "default-pool"
   }
 }
 

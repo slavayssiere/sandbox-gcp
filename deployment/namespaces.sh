@@ -12,7 +12,7 @@ kubectl create secret generic twitter-secrets \
     -n injectors
 
 kubectl create secret generic sa-pubsub-publisher \
-    --from-file=../../iac/sa-pubsub-publisher.json \
+    --from-file=../iac/sa-pubsub-publisher.json \
     -n injectors
 
 kubectl apply -f injector-twitter.yaml
@@ -21,12 +21,14 @@ kubectl apply -f injector-twitter.yaml
 kubectl create ns normalizers
 
 kubectl create secret generic sa-pubsub-full \
-    --from-file=../../iac/sa-pubsub-full.json \
+    --from-file=../iac/sa-pubsub-full.json \
     -n normalizers
+
+kubectl apply -f normalizer-twitter.yaml
 
 ################################ Consumers ################################
 kubectl create ns consumers
 
 kubectl create secret generic sa-pubsub-subscriber \
-    --from-file=../../iac/sa-pubsub-subscriber.json \
+    --from-file=../iac/sa-pubsub-subscriber.json \
     -n consumers
