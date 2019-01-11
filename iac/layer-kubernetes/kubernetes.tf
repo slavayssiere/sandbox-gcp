@@ -2,7 +2,6 @@ resource "google_container_cluster" "test-cluster" {
   provider           = "google-beta"
   name               = "test-cluster"
   region             = "${var.region}"
-  initial_node_count = 1
 
   private_cluster_config {
     enable_private_endpoint = false

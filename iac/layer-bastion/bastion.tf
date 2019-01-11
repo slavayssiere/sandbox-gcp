@@ -10,8 +10,12 @@ resource "google_compute_firewall" "training_fw_rules" {
   target_tags = ["bastion"]
 }
 
-data "google_dns_managed_zone" "gcp-wescale" {
+data "google_dns_managed_zone" "public-gcp-wescale" {
   name = "gcp-wescale"
+}
+
+data "google_dns_managed_zone" "private-gcp-wescale" {
+  name = "private-dns-zone"
 }
 
 resource "google_dns_record_set" "bastion" {

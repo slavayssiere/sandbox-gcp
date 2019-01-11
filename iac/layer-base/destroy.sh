@@ -6,9 +6,12 @@ gcloud config set compute/region $REGION
 
 gcloud -q beta compute routers nats delete nat-$REGION --router=nat-$REGION
 gcloud -q beta compute routers delete nat-$REGION
+gcloud -q beta dns managed-zones delete private-dns-zone
 
 terraform destroy \
     -auto-approve
+
+
 
 # # bastion
 

@@ -3,7 +3,7 @@ export GCP_PROJECT=$(gcloud config get-value project)
 export TOPIC_NAME="projects/$GCP_PROJECT/topics/raw-twitter"
 export SECRET_PATH="$HOME/gcp-secret/bigdata-project.json"
 
-docker build -t eu.gcr.io/$GCP_PROJECT/twitter-injector:latest .
+docker build -t eu.gcr.io/$GCP_PROJECT/twitter-injector:0.0.1 .
 
 # docker run -d \
 #     -v $SECRET_PATH:/secret/secret-sa-gcp-pubsub.json \

@@ -7,3 +7,6 @@ env.sh
 iac/layer-kubernetes/certs/ca.crt
 iac/layer-kubernetes/certs/client.crt
 iac/layer-kubernetes/certs/client.key
+iac/sa-pubsub-full.json
+iac/sa-pubsub-publisher.json
+iac/sa-pubsub-subscriber.json
