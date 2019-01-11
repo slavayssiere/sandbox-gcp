@@ -22,11 +22,9 @@ spec:
     spec:
       containers:
       - name: my-injector
-        image: eu.gcr.io/slavayssiere-sandbox/twitter-injector:0.0.3
+        image: eu.gcr.io/slavayssiere-sandbox/twitter-injector:0.0.8
         imagePullPolicy: Always
         env:
-        - name: MESSAGE_SIZE
-          value: "1024"
         - name: TOPIC_NAME
           value: "projects/slavayssiere-sandbox/topics/twitter-raw"
         - name: HASHTAG

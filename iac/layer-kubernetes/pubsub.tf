@@ -26,25 +26,13 @@ resource "google_pubsub_subscription" "mastodon-raw-sub" {
 
 // Normalized topics
 
-resource "google_pubsub_topic" "twitter-normalized" {
-  name = "twitter-normalized"
+resource "google_pubsub_topic" "messages-normalized" {
+  name = "messages-normalized"
 }
 
-resource "google_pubsub_subscription" "twitter-normalized-sub" {
-  name  = "twitter-normalized-sub"
-  topic = "${google_pubsub_topic.twitter-normalized.name}"
+resource "google_pubsub_subscription" "messages-normalized-sub" {
+  name  = "messages-normalized-sub"
+  topic = "${google_pubsub_topic.messages-normalized.name}"
 
   ack_deadline_seconds = 20
 }
-
-resource "google_pubsub_topic" "mastodon-normalized" {
-  name = "mastodon-normalized"
-}
-
-resource "google_pubsub_subscription" "mastodon-normalized-sub" {
-  name  = "mastodon-normalized-sub"
-  topic = "${google_pubsub_topic.mastodon-normalized.name}"
-
-  ack_deadline_seconds = 20
-}
-

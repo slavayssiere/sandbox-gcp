@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -19,6 +20,12 @@ func (s server) consumemessage() {
 	ctx := context.Background()
 
 	for {
+		if ctx == nil {
+			log.Println("Context is nil")
+		}
+		if s.sub == nil {
+			log.Println("s.sub is nil")
+		}
 		resp, err := s.sub.Pull(ctx, &pull)
 		if err != nil {
 			fmt.Println(err)
@@ -40,7 +47,7 @@ func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, 
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 	if starttime, err := strconv.ParseInt(msg.Attributes["time"], 10, 64); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	} else {
 		var elapsedTime float64
 		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - starttime)
@@ -49,7 +56,7 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 		var tweet twitter.Tweet
 		err := json.Unmarshal(msg.Data, &tweet)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			s.tweetStream <- tweet
 		}

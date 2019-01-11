@@ -34,16 +34,19 @@ type server struct {
 
 func (s server) convert() {
 	for {
-		tweet <- s.tweetStream 
+		tweet := <- s.tweetStream 
 		var u libmetier.MessageSocial
 		u.Data = tweet.Text
 		u.User = tweet.User.Email
 		u.Source = "twitter"
+		log.Println(u)
 		s.msgStream <- u
 	}
 }
 
 func main() {
+
+	flag.Parse()
 
 	var s server
 
@@ -52,16 +55,17 @@ func main() {
 	s.sub = connexionSubcriber("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 
 	s.tweetStream = make(chan twitter.Tweet)
+	s.msgStream = make(chan libmetier.MessageSocial)
 
 	s.timeProm = getPromTime()
 
 	log.Println("launch converter thread")
 	go s.convert()
 
-	println("launch consume thread")
+	log.Println("launch consume thread")
 	go s.consumemessage()
 
-	println("launch send thread")
+	log.Println("launch send thread")
 	go s.sendMessage()
 
 	var gracefulStop = make(chan os.Signal)
@@ -75,7 +79,6 @@ func main() {
 		os.Exit(0)
 	}()
 
-	flag.Parse()
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
 }

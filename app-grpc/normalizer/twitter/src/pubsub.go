@@ -71,9 +71,6 @@ func (s server) publishmessage(mess *pubsub.PubsubMessage) {
 	var request pubsub.PublishRequest
 	request.Topic = *topic
 	request.Messages = append(request.Messages, mess)
-
-	fmt.Println(request)
-
 	ctx := context.Background()
 
 	if _, err := s.pub.Publish(ctx, &request); err != nil {

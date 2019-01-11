@@ -1,10 +1,8 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"log"
-	"strconv"
 
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 )
@@ -12,6 +10,7 @@ import (
 func (s server) sendMessage() {
 
 	for {
+		log.Println("Wait for msgSTream...")
 		msg := <-s.msgStream
 
 		var message pubsub.PubsubMessage
@@ -19,10 +18,8 @@ func (s server) sendMessage() {
 		if err != nil {
 			log.Println(err)
 		}
-		ctx := context.Background()
 		message.Data = []byte(b)
 		message.Attributes = make(map[string]string)
-		message.Attributes["time"] = strconv.FormatInt(entry.StartTime, 10)
 		message.Attributes["source"] = "twitter"
 
 		s.publishmessage(&message)

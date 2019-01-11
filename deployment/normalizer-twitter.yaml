@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-normalized
-        image: eu.gcr.io/slavayssiere-sandbox/twitter-normalizer:0.0.1
+        image: eu.gcr.io/slavayssiere-sandbox/twitter-normalizer:0.0.2
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 

@@ -65,7 +65,6 @@ func main() {
 	tc.demux = twitter.NewSwitchDemux()
 	tc.demux.Tweet = func(tweet *twitter.Tweet) {
 		if tweet != nil {
-			log.Println(tweet)
 			s.publishmessage(tweet, s.publishTimeChan)
 			s.countInjectors.WithLabelValues(*hashtag).Add(1)
 		} else {
@@ -74,8 +73,6 @@ func main() {
 	}
 	// Receive messages until stopped or stream quits
 	tc.strm = tc.filterTwitter(*hashtag)
-	log.Println(tc.demux)
-	log.Println(tc.strm)
 	go tc.demux.HandleChan(tc.strm.Messages)
 
 	var gracefulStop = make(chan os.Signal)
