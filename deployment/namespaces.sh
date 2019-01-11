@@ -4,6 +4,7 @@ GCP_PROJECT="slavayssiere-sandbox"
 
 ################################ Injectors ################################
 kubectl create ns injectors
+source ../env.sh
 kubectl create secret generic twitter-secrets \
     --from-literal=CONSUMER_KEY=$CONSUMER_KEY \
     --from-literal=CONSUMER_SECRET=$CONSUMER_SECRET \

@@ -2,8 +2,9 @@
 
 REGION="europe-west1"
 SUBNET_EUROPE1_CIDR="192.168.0.0/20"
+GCP_PROJECT="slavayssiere-sandbox"
 
-gcloud config set project slavayssiere-sandbox
+gcloud config set project $GCP_PROJECT
 gcloud config set compute/region $REGION
 
 terraform apply \

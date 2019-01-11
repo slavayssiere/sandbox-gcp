@@ -14,6 +14,14 @@ resource "google_container_cluster" "test-cluster" {
       cidr_block   = "195.81.225.200/32"
       display_name = "routard.com"
     }
+    cidr_blocks {
+      cidr_block   = "81.56.12.49/32"
+      display_name = "chez_moi"
+    }
+    cidr_blocks {
+      cidr_block   = "81.250.133.68/32"
+      display_name = "wescale.fr"
+    }
   }
 
   min_master_version = "1.11.5-gke.5"
@@ -47,7 +55,7 @@ resource "google_container_node_pool" "np-default" {
   name       = "np-default"
   region     = "${var.region}"
   cluster    = "${google_container_cluster.test-cluster.name}"
-  node_count = 3
+  node_count = 1
 
   node_config {
     machine_type = "n1-standard-4"

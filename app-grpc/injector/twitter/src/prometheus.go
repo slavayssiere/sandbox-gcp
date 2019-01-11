@@ -8,7 +8,7 @@ func promHistogramVec() *prometheus.HistogramVec {
 			Name: "mean_in_injector",
 			Help: "Time for pubish to pubsub in nanosecond",
 		},
-		[]string{"size", "trade"},
+		[]string{"hashtag", "trade"},
 	)
 
 	prometheus.Register(histogramMean)
@@ -20,9 +20,9 @@ func promCounterVec() *prometheus.CounterVec {
 	messagesCounter := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "messages_injected",
-			Help: "How many messages injected, partitioned by size and trade",
+			Help: "How many messages injected, partitioned by hashtag",
 		},
-		[]string{"size", "trade"},
+		[]string{"hashtag"},
 	)
 
 	prometheus.Register(messagesCounter)
