@@ -1,4 +1,4 @@
-module github.com/slavayssiere/sandbox-gcp/app-grpc/normalizer
+module github.com/slavayssiere/sandbox-gcp/app-grpc/normalizer/twitter
 
 require (
 	cloud.google.com/go v0.26.0

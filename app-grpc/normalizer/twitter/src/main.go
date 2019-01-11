@@ -15,6 +15,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
+	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 )
 
 var (
@@ -27,7 +28,19 @@ type server struct {
 	pub         pubsub.PublisherClient
 	sub         pubsub.SubscriberClient
 	tweetStream chan twitter.Tweet
+	msgStream chan libmetier.MessageSocial
 	timeProm        *prometheus.HistogramVec
+}
+
+func (s server) convert() {
+	for {
+		tweet <- s.tweetStream 
+		var u libmetier.MessageSocial
+		u.Data = tweet.Text
+		u.User = tweet.User.Email
+		u.Source = "twitter"
+		s.msgStream <- u
+	}
 }
 
 func main() {
@@ -44,7 +57,7 @@ func main() {
 
 	log.Println("launch converter thread")
 	go s.convert()
-	
+
 	println("launch consume thread")
 	go s.consumemessage()
 

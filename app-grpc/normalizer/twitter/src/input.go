@@ -33,7 +33,7 @@ func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, 
 	ackMess.Subscription = pull.Subscription
 	for _, messRec := range resp.ReceivedMessages {
 		ackMess.AckIds = append(ackMess.AckIds, messRec.GetAckId())
-		msgreceive(messRec.GetMessage())
+		s.msgreceive(messRec.GetMessage())
 	}
 	s.sub.Acknowledge(ctx, &ackMess)
 }
@@ -50,7 +50,8 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 		err := json.Unmarshal(msg.Data, &tweet)
 		if err != nil {
 			fmt.Println(err)
+		} else {
+			s.tweetStream <- tweet
 		}
-		s.tweetStream <- tweet
 	}
 }

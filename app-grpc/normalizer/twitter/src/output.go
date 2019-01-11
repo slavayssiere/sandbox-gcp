@@ -1,26 +1,30 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
+	"log"
 	"strconv"
-	"time"
 
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 )
 
-func sendMessage(client pubsub.PublisherClient, entryStream chan *Entry) {
-
-	// defer wg.Done()
+func (s server) sendMessage() {
 
 	for {
-		entry := <-entryStream
+		msg := <-s.msgStream
 
 		var message pubsub.PubsubMessage
-		var encodedEntry = encodeEntry(entry)
-		message.Data = encodedEntry.Bytes()
+		b, err := json.Marshal(msg)
+		if err != nil {
+			log.Println(err)
+		}
+		ctx := context.Background()
+		message.Data = []byte(b)
 		message.Attributes = make(map[string]string)
 		message.Attributes["time"] = strconv.FormatInt(entry.StartTime, 10)
-		message.Attributes["normalizer_time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
+		message.Attributes["source"] = "twitter"
 
-		publishmessage(&message, client)
+		s.publishmessage(&message)
 	}
 }
