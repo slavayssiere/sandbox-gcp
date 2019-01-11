@@ -28,19 +28,28 @@ gcloud -q beta dns managed-zones create private-dns-zone \
     --networks=demo-net
 
 
+## for injectors
 gcloud iam service-accounts create "sa-pubsub-publisher"
     --display-name "SA for pubsub publish apps"
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.publisher
 
+## for consumer
 gcloud iam service-accounts create "sa-pubsub-subscriber"
     --display-name "SA for pubsub publish apps"
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.user
 
+## for normalizers
 gcloud iam service-accounts create "sa-pubsub-full"
     --display-name "SA for pubsub publish apps"
-
-gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.publisher
-gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.publisher
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
+
+## for aggregators
+gcloud iam service-accounts create "sa-aggregator"
+    --display-name "SA for aggregator apps"
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner
 
 gcloud iam service-accounts keys create ../sa-pubsub-publisher.json \
   --iam-account sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com
@@ -50,4 +59,7 @@ gcloud iam service-accounts keys create ../sa-pubsub-subscriber.json \
 
 gcloud iam service-accounts keys create ../sa-pubsub-full.json \
   --iam-account sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com
+
+gcloud iam service-accounts keys create ../sa-aggregator.json \
+  --iam-account sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com
 

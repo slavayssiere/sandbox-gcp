@@ -11,21 +11,7 @@ gcloud -q beta dns managed-zones delete private-dns-zone
 terraform destroy \
     -auto-approve
 
-
-
-# # bastion
-
-# gcloud compute instances delete nat-test-1
-
-# # kubernetes
-
-# gcloud container clusters delete private-cluster-1 
-
-
-# # network
-
-# gcloud compute firewall-rules delete fw-0
-
-# gcloud compute networks subnets delete subnet-0
-
-# gcloud compute networks delete net-0 
+gcloud -q iam service-accounts delete "sa-pubsub-publisher"
+gcloud -q iam service-accounts delete "sa-pubsub-subscriber"
+gcloud -q iam service-accounts delete "sa-pubsub-full"
+gcloud -q iam service-accounts delete "sa-aggregator"

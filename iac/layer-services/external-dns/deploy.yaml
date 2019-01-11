@@ -41,6 +41,7 @@ metadata:
   name: external-dns
   namespace: kube-system
 spec:
+  replicas: 3
   strategy:
     type: Recreate
   template:
