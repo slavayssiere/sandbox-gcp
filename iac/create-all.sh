@@ -10,6 +10,10 @@ cd layer-kubernetes
 ./apply.sh
 cd -
 
+cd layer-data
+./apply.sh
+cd -
+
 cd layer-services
 ./apply.sh
 cd -

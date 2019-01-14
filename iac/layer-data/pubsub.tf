@@ -36,3 +36,10 @@ resource "google_pubsub_subscription" "messages-normalized-sub" {
 
   ack_deadline_seconds = 20
 }
+
+resource "google_pubsub_subscription" "messages-normalized-sub-bigtable" {
+  name  = "messages-normalized-sub-bigtable"
+  topic = "${google_pubsub_topic.messages-normalized.name}"
+
+  ack_deadline_seconds = 20
+}

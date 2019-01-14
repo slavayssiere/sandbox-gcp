@@ -10,3 +10,4 @@ iac/layer-kubernetes/certs/client.key
 iac/sa-pubsub-full.json
 iac/sa-pubsub-publisher.json
 iac/sa-pubsub-subscriber.json
+iac/layer-data/.terraform/*
