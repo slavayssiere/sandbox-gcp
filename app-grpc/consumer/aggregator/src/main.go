@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"cloud.google.com/go/bigtable"
+	"cloud.google.com/go/datastore"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
@@ -19,15 +19,13 @@ var (
 	addr           = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
 	hashtag        = flag.String("hashtag", os.Getenv("HASHTAG"), "Twitter hashtag")
 	projectid      = flag.String("project-id", os.Getenv("PROJECT_ID"), "Twitter hashtag")
-	instanceid     = flag.String("instance-id", os.Getenv("INSTANCE_ID"), "Twitter hashtag")
-	tableid        = flag.String("table-id", os.Getenv("TABLE_ID"), "Twitter hashtag")
 	subname        = flag.String("sub-name", os.Getenv("SUB_NAME"), "Twitter hashtag")
 	secretpath     = flag.String("secret-path", os.Getenv("SECRET_PATH"), "Twitter hashtag")
 )
 
 type server struct {
 	sub pubsub.SubscriberClient
-	bt bigtable.Client
+	ds *datastore.Client
 	messages chan libmetier.MessageSocial
 	timeProm *prometheus.HistogramVec
 }
@@ -42,7 +40,7 @@ func main() {
 
 	log.Println("Get secret from: " + *secretpath)
 	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
-	s.bt = bigtableClient(ctx)
+	s.ds = datastoreClient(ctx)
 	s.messages = make(chan libmetier.MessageSocial)
 	s.timeProm = promHistogramVec()
 

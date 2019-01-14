@@ -12,3 +12,4 @@ iac/sa-pubsub-publisher.json
 iac/sa-pubsub-subscriber.json
 iac/layer-data/.terraform/*
 iac/sa-aggregator.json
+iac/sa-pubsub-bigtable.json

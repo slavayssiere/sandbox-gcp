@@ -18,3 +18,4 @@ gcloud -q iam service-accounts delete "sa-pubsub-publisher@$GCP_PROJECT.iam.gser
 gcloud -q iam service-accounts delete "sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com"
 gcloud -q iam service-accounts delete "sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com"
 gcloud -q iam service-accounts delete "sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com"
+gcloud -q iam service-accounts delete "sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com"

@@ -1,4 +1,4 @@
-module github.com/slavayssiere/sandbox-gcp/app-grpc/consumer/bigtable
+module github.com/slavayssiere/sandbox-gcp/app-grpc/consumer/aggregator
 
 require (
 	cloud.google.com/go v0.34.0

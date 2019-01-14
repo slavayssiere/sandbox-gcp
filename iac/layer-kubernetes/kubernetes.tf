@@ -11,16 +11,20 @@ resource "google_container_cluster" "test-cluster" {
 
   master_authorized_networks_config {
     cidr_blocks {
-      cidr_block   = "195.81.225.200/32"
-      display_name = "routard.com"
-    }
-    cidr_blocks {
       cidr_block   = "81.56.12.49/32"
       display_name = "chez_moi"
     }
     cidr_blocks {
       cidr_block   = "81.250.133.68/32"
       display_name = "wescale.fr"
+    }
+    cidr_blocks {
+      cidr_block   = "195.137.181.15/32"
+      display_name = "client1"
+    }
+    cidr_blocks {
+      cidr_block   = "195.81.225.200/32"
+      display_name = "client2"
     }
   }
 

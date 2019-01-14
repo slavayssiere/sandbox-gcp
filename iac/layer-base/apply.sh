@@ -29,27 +29,34 @@ gcloud -q beta dns managed-zones create private-dns-zone \
 
 
 ## for injectors
-gcloud iam service-accounts create "sa-pubsub-publisher"
+gcloud iam service-accounts create "sa-pubsub-publisher" \
     --display-name "SA for pubsub publish apps"
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.publisher
 
 ## for consumer
-gcloud iam service-accounts create "sa-pubsub-subscriber"
+gcloud iam service-accounts create "sa-pubsub-subscriber" \
     --display-name "SA for pubsub publish apps"
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
-gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.user
 
 ## for normalizers
-gcloud iam service-accounts create "sa-pubsub-full"
+gcloud iam service-accounts create "sa-pubsub-full" \
     --display-name "SA for pubsub publish apps"
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.publisher
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-full@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
 
 ## for aggregators
-gcloud iam service-accounts create "sa-aggregator"
+gcloud iam service-accounts create "sa-aggregator" \
     --display-name "SA for aggregator apps"
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner
+
+
+## for sa-pubsub-bigtable
+gcloud iam service-accounts create "sa-pubsub-bigtable" \
+    --display-name "SA for pubsub and bigtable apps"
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.admin
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.user
 
 gcloud iam service-accounts keys create ../sa-pubsub-publisher.json \
   --iam-account sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com
@@ -62,4 +69,7 @@ gcloud iam service-accounts keys create ../sa-pubsub-full.json \
 
 gcloud iam service-accounts keys create ../sa-aggregator.json \
   --iam-account sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com
+
+gcloud iam service-accounts keys create ../sa-pubsub-bigtable.json \
+  --iam-account sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com
 

@@ -22,8 +22,10 @@ spec:
     spec:
       containers:
       - name: app
-        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.1
+        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.4
         imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub"
@@ -82,8 +84,8 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: grafana
-          servicePort: 3000
+          serviceName: app-sse-svc
+          servicePort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -98,4 +100,5 @@ spec:
   ports:
     - protocol: TCP
       port: 8080
+      targetPort: 8080
     

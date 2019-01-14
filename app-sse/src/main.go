@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 )
@@ -24,7 +25,6 @@ type server struct {
 }
 
 var (
-	addr    = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
 	subName = flag.String("sub-name", os.Getenv("SUB_NAME"), "the pubsub sunbscription")
 	message pubsub.PubsubMessage
 )
@@ -55,11 +55,13 @@ func main() {
 	go s.consumemessage()
 
 	// Start processing events
+	log.Println("Start processing events")
 	go s.b.start()
 
 	// Generate a constant stream of events that get pushed
 	// into the Broker's messages channel and are then broadcast
 	// out to any clients that are attached.
+	log.Println("Start get messages function")
 	go func() {
 		for {
 			ms := <-s.messages
@@ -73,6 +75,7 @@ func main() {
 		}
 	}()
 
+	log.Println("Start end function")
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
@@ -84,7 +87,9 @@ func main() {
 		os.Exit(0)
 	}()
 
-	http.Handle("/events/", s.b)
 	http.Handle("/", http.HandlerFunc(handler))
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	http.Handle("/events/", s.b)
+	http.Handle("/metrics", promhttp.Handler())
+	log.Println("launch server")
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }

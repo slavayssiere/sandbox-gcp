@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/binary"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"time"
 
 	"cloud.google.com/go/bigtable"
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
 )
 
 // User-provided constants.
@@ -31,23 +34,10 @@ func sliceContains(list []string, target string) bool {
 }
 
 func bigtableClient(ctx context.Context) bigtable.Client {
-	adminClient, err := bigtable.NewAdminClient(ctx, *projectid, *instanceid)
-	if err != nil {
-		log.Fatalf("Could not create admin client: %v", err)
-	}
+	jsonKey, err := ioutil.ReadFile(*secretpath)
+	config, err := google.JWTConfigFromJSON(jsonKey, bigtable.Scope) // or bigtable.AdminScope, etc. 
 
-	tblInfo, err := adminClient.TableInfo(ctx, *tableid)
-	if err != nil {
-		log.Fatalf("Could not read info for table %s: %v", *tableid, err)
-	}
-
-	if !sliceContains(tblInfo.Families, columnFamilyName) {
-		if err := adminClient.CreateColumnFamily(ctx, *tableid, columnFamilyName); err != nil {
-			log.Fatalf("Could not create column family %s: %v", columnFamilyName, err)
-		}
-	}
-
-	client, err := bigtable.NewClient(ctx, *projectid, *instanceid)
+	client, err := bigtable.NewClient(ctx, *projectid, *instanceid, option.WithTokenSource(config.TokenSource(ctx)))
 	if err != nil {
 		log.Fatalf("Could not create data operations client: %v", err)
 	}
