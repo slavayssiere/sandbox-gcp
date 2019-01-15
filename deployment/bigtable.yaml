@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-bt
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.4
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.5
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 

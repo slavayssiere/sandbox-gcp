@@ -8,9 +8,9 @@ import (
 
 // AggregatedData a common social msg
 type AggregatedData struct {
-	User  string    `json:"user"`
-	Count int64     `json:"count"`
-	Date  time.Time `json:"timestamp"`
+	User  string    `json:"user" datastore:"user"`
+	Count int64     `json:"count" datastore:"count"`
+	Date  time.Time `json:"timestamp" datastore:"date"`
 }
 
 // ListAggregatedData list aggregatedata
