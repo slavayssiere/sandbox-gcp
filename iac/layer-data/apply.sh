@@ -1,10 +1,21 @@
 #!/bin/bash
 
 REGION="europe-west1"
+GCP_PROJECT="slavayssiere-sandbox"
 
 terraform apply \
     --var "region=$REGION" \
     -auto-approve
 
+BT_INSTANCE="test-instance"
+BT_TABLE="test-table"
 
-cbt -instance "test-instance" createfamily "test-table" ms
+gcloud beta bigtable instances create $BT_INSTANCE \
+   --cluster=$BT_INSTANCE \
+   --cluster-zone="europe-west1-b" \
+   --display-name=$BT_INSTANCE \
+   --cluster-num-nodes=3
+
+# Sample code to bootstrap BigTable structure and inserting a sample value
+cbt -instance $BT_INSTANCE createtable $BT_TABLE
+cbt -instance $BT_INSTANCE createfamily $BT_TABLE ms

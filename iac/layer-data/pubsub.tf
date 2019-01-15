@@ -1,4 +1,3 @@
-
 // Raw topics
 
 resource "google_pubsub_topic" "twitter-raw" {
@@ -23,7 +22,6 @@ resource "google_pubsub_subscription" "mastodon-raw-sub" {
   ack_deadline_seconds = 20
 }
 
-
 // Normalized topics
 
 resource "google_pubsub_topic" "messages-normalized" {
@@ -39,6 +37,13 @@ resource "google_pubsub_subscription" "messages-normalized-sub" {
 
 resource "google_pubsub_subscription" "messages-normalized-sub-bigtable" {
   name  = "messages-normalized-sub-bigtable"
+  topic = "${google_pubsub_topic.messages-normalized.name}"
+
+  ack_deadline_seconds = 20
+}
+
+resource "google_pubsub_subscription" "messages-normalized-sub-datastore" {
+  name  = "messages-normalized-sub-datastore"
   topic = "${google_pubsub_topic.messages-normalized.name}"
 
   ack_deadline_seconds = 20

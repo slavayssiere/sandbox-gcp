@@ -19,6 +19,7 @@ VOLUME /secret
 ENV PROJECT_ID "slavayssiere-sandbox"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
 ENV PROM_PORT 8080
+ENV REDIS_HOST "redis.gcp.wescale"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/aggregator /app/

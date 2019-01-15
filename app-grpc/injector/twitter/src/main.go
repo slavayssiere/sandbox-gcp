@@ -22,6 +22,7 @@ var (
 	accessToken    = flag.String("access-token", os.Getenv("ACCESS_TOKEN"), "Twitter Access Token")
 	accessSecret   = flag.String("access-secret", os.Getenv("ACCESS_SECRET"), "Twitter Access Secret")
 	hashtag        = flag.String("hashtag", os.Getenv("HASHTAG"), "Twitter hashtag")
+	topicname      = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "Twitter hashtag")
 )
 
 type server struct {

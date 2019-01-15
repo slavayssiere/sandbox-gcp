@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
@@ -58,7 +57,8 @@ func (s server) publishmessage(tweet *twitter.Tweet, publishTime chan int64) {
 	message.Attributes["source"] = "twitter"
 	message.Attributes["time"] = strconv.FormatInt(start.UnixNano(), 10)
 
-	request.Topic = os.Getenv("TOPIC_NAME")
+	request.Topic = *topicname
+	log.Println("send message to " + *topicname)
 	request.Messages = append(request.Messages, &message)
 
 	if _, err := s.ps.Publish(ctx, &request); err != nil {
