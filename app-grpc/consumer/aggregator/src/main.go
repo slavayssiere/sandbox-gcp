@@ -100,7 +100,7 @@ func main() {
 		Handler(handlerHealth)
 	
 	var handlerUsers http.Handler
-	handlerUsers = LoggerMiddleware(handlerUsersFunc, "users_get")
+	handlerUsers = LoggerMiddleware(s.handlerUsersFunc, "users_get")
 	router.
 		Methods("GET").
 		Path("/users").

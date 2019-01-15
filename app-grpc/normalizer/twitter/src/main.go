@@ -37,7 +37,8 @@ func (s server) convert() {
 		tweet := <- s.tweetStream 
 		var u libmetier.MessageSocial
 		u.Data = tweet.Text
-		u.User = tweet.User.Email
+		u.User = tweet.User.Name
+		log.Println(tweet.User)
 		u.Source = "twitter"
 		log.Println(u)
 		s.msgStream <- u

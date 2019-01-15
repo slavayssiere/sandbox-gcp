@@ -33,6 +33,7 @@ gcloud iam service-accounts create "sa-pubsub-subscriber" --display-name "SA for
 gcloud iam service-accounts create "sa-pubsub-full" --display-name "SA for pubsub publish apps"
 gcloud iam service-accounts create "sa-aggregator" --display-name "SA for aggregator apps"
 gcloud iam service-accounts create "sa-pubsub-bigtable" --display-name "SA for pubsub and bigtable apps"
+gcloud iam service-accounts create "sa-pubsub-datastore" --display-name "SA for pubsub and datastore apps"
 
 
 ## for injectors
@@ -49,6 +50,9 @@ gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-a
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.admin
 gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com --role roles/bigtable.user
+## for aggregator
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
+gcloud projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner
 
 gcloud iam service-accounts keys create ../sa-pubsub-publisher.json \
   --iam-account sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com
@@ -64,4 +68,7 @@ gcloud iam service-accounts keys create ../sa-aggregator.json \
 
 gcloud iam service-accounts keys create ../sa-pubsub-bigtable.json \
   --iam-account sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com
+
+gcloud iam service-accounts keys create ../sa-pubsub-datastore.json \
+  --iam-account sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com
 

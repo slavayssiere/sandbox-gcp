@@ -8,7 +8,7 @@ func promHistogramVec() *prometheus.HistogramVec {
 			Name: "mean_in_injector",
 			Help: "Time for pubish to pubsub in nanosecond",
 		},
-		[]string{"hashtag", "trade"},
+		[]string{"subname"},
 	)
 
 	prometheus.Register(histogramMean)

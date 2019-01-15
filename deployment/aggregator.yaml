@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: normalized-twitter-deploy
-  namespace: normalizers
+  name: aggregator-deploy
+  namespace: consumers
   labels:
-    app: normalized-twitter-deploy
+    app: aggregator-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: normalized-twitter-deploy
+      app: aggregator-deploy
   template:
     metadata:
       labels:
-        app: normalized-twitter-deploy
+        app: aggregator-deploy
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/path: '/metrics'
@@ -21,23 +21,23 @@ spec:
         prometheus.io/normalizer: 'true'
     spec:
       containers:
-      - name: my-normalized
-        image: eu.gcr.io/slavayssiere-sandbox/twitter-normalizer:0.0.3
+      - name: my-ds
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-datastore:0.0.2
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
-          value: "projects/slavayssiere-sandbox/subscriptions/twitter-raw-sub"
-        - name: TOPIC_NAME 
-          value: "projects/slavayssiere-sandbox/topics/messages-normalized"
+          value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"
         - name: SECRET_PATH
-          value: "/secret/sa-pubsub-full.json"
+          value: "/secret/sa-pubsub-datastore.json"
+        - name: REDIS_HOST
+          value: redis.gcp.wescale
         resources:
           requests:
-            memory: 20M
-            cpu: 10m
+            memory: 50M
+            cpu: 50m
           limits:
-            memory: 20M
-            cpu: 10m
+            memory: 100M
+            cpu: 100m
         volumeMounts:
           - name: secret-sa
             mountPath: "/secret"
@@ -46,13 +46,13 @@ spec:
       volumes:
       - name: secret-sa
         secret:
-          secretName: sa-pubsub-full
+          secretName: sa-pubsub-datastore
 ---
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: normalized-twitter-name
-  namespace: normalizers
+  name: aggregator-hpa
+  namespace: consumers
 spec:
   minReplicas: 2
   maxReplicas: 10
@@ -61,10 +61,10 @@ spec:
       metricName: pubsub.googleapis.com|subscription|num_undelivered_messages
       metricSelector:
         matchLabels:
-          resource.labels.subscription_id: "twitter-raw-sub"
+          resource.labels.subscription_id: "messages-normalized-sub-datastore"
       targetAverageValue: "10"
     type: External
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: normalized-twitter-deploy
+    name: aggregator-deploy

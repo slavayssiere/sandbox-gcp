@@ -22,7 +22,7 @@ data "google_dns_managed_zone" "private" {
 
 resource "google_dns_record_set" "redis" {
   name = "redis.${data.google_dns_managed_zone.private.dns_name}"
-  type = "CNAME"
+  type = "A"
   ttl  = 300
 
   managed_zone = "${data.google_dns_managed_zone.private.name}"

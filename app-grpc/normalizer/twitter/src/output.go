@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
+	"time"
 
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 )
@@ -22,7 +23,7 @@ func (s server) sendMessage() {
 		message.Data = []byte(b)
 		message.Attributes = make(map[string]string)
 		message.Attributes["source"] = "twitter"
-		message.Attributes["time"] = strconv.FormatInt(start.UnixNano(), 10)
+		message.Attributes["time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
 
 		s.publishmessage(&message)
 	}

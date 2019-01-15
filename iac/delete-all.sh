@@ -14,5 +14,4 @@ cd layer-base
 ./destroy.sh
 cd -
 
-GCP_PROJECT="slavayssiere-sandbox"
-cbt -project $PROJECT deleteinstance "test-instance"
+cbt deleteinstance "test-instance"

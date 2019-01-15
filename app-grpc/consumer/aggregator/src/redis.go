@@ -32,7 +32,10 @@ func (s server) getUsersCounter() []libmetier.AggregatedData {
 	for id := range users {
 		var user libmetier.AggregatedData
 		user.User = users[id]
-		user.Count = s.redis.Get(users[id])
+		user.Count, err = s.redis.Get(users[id]).Int64()
+		if err != nil {
+			log.Println(err)
+		}
 		user.Date = time.Now()
 	}
 	return ret
@@ -42,6 +45,8 @@ func (s server) writeMessages(ctx context.Context) {
 
 	for {
 		mess := <-s.messages
-		s.countUser(mess.User)
+		if len(mess.User) > 0 {
+			s.countUser(mess.User)
+		}
 	}
 }

@@ -35,6 +35,11 @@ kubectl create secret generic sa-pubsub-bigtable \
     -n consumers
 
 
+kubectl create secret generic sa-pubsub-datastore \
+    --from-file=../iac/sa-pubsub-datastore.json \
+    -n consumers
+
+
 ################################ Aggregators ################################
 kubectl create ns aggregators
 

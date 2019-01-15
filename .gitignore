@@ -15,3 +15,5 @@ iac/sa-aggregator.json
 iac/sa-pubsub-bigtable.json
 iac/layer-base/errored.tfstate
 iac/layer-kubernetes/errored.tfstate
+iac/sa-pubsub-datastore.json
+app-grpc/consumer/aggregator/src/aggregator
