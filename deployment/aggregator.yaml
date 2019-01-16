@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.3
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.4
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 

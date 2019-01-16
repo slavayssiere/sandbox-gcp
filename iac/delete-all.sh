@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd ../visualizer
+echo "Destroy dataset..."
 ./destroy.sh
 cd -
 
@@ -19,3 +20,10 @@ cd layer-base
 cd -
 
 cbt deleteinstance "test-instance"
+
+gcloud dataflow jobs run delete-datastore \
+    --gcs-location gs://dataflow-templates/latest/Datastore_to_Datastore_Delete \
+    --parameters \
+datastoreReadGqlQuery="SELECT * FROM userstats",\
+datastoreReadProjectId="slavayssiere-sandbox",\
+datastoreDeleteProjectId="slavayssiere-sandbox"

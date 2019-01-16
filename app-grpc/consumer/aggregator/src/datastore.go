@@ -97,10 +97,9 @@ func top10(ads []libmetier.AggregatedData) []libmetier.AggregatedData{
 	By(count).Sort(ads)
 
 	if len(ads) > 10 {
-		return ads[:10]
-	} else {
-		return ads
+		ads=ads[:10]
 	}
+	return ads
 }
 
 // By is the type of a "less" function that defines the ordering of users
