@@ -67,7 +67,7 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 	if starttime, err := strconv.ParseInt(msg.Attributes["time"], 10, 64); err == nil {
 		var elapsedTime float64
 		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - starttime)
-		s.timeProm.WithLabelValues("time").Observe(elapsedTime)
+		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
 	}
 	var ms libmetier.MessageSocial
 	err := json.Unmarshal(msg.Data, &ms)

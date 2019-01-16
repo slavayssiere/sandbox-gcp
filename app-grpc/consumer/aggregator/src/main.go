@@ -58,6 +58,7 @@ type server struct {
 	messages chan libmetier.MessageSocial
 	timeProm *prometheus.HistogramVec
 	redis *redis.Client
+	ctx context.Context
 }
 
 func main() {
@@ -66,11 +67,11 @@ func main() {
 	var s server
 
 	// Define globals
-	ctx := context.Background()
+	s.ctx = context.Background()
 
 	log.Println("Get secret from: " + *secretpath)
 	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
-	s.ds = datastoreClient(ctx)
+	s.ds = datastoreClient(s.ctx)
 	s.messages = make(chan libmetier.MessageSocial)
 	s.timeProm = promHistogramVec()
 	s.redis = redisNew()
@@ -78,8 +79,8 @@ func main() {
 	println("launch consume thread")
 	go s.consumemessage()
 
-	println("write in bigtable")
-	go s.writeMessages(ctx)
+	println("write in redis")
+	go s.writeMessagesToRedis()
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -106,6 +107,15 @@ func main() {
 		Path("/users").
 		Name("users_get").
 		Handler(handlerUsers)
+
+
+	var handlerPostUsers http.Handler
+	handlerPostUsers = LoggerMiddleware(s.handlerPostUsersFunc, "users_post")
+	router.
+		Methods("POST").
+		Path("/create").
+		Name("users_post").
+		Handler(handlerPostUsers)
 
 	router.Methods("GET").Path("/metrics").Name("Metrics").Handler(promhttp.Handler())
 

@@ -19,3 +19,8 @@ gcloud beta bigtable instances create $BT_INSTANCE \
 # Sample code to bootstrap BigTable structure and inserting a sample value
 cbt -instance $BT_INSTANCE createtable $BT_TABLE
 cbt -instance $BT_INSTANCE createfamily $BT_TABLE ms
+
+gcloud beta scheduler jobs create http aggregator-call \
+    --schedule="*/5 * * * *" \
+    --uri="http://private.gcp.wescale/stats" \
+    --http-method=POST

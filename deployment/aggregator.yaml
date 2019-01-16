@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-datastore:0.0.2
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.3
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -68,3 +68,37 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: aggregator-deploy
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: aggregator-ing
+  namespace: consumers
+  annotations:
+    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+  labels:
+    traffic-type: external
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /stats
+        backend:
+          serviceName: aggregator-svc
+          servicePort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aggregator-svc
+  namespace: consumers
+  labels:
+    k8s-app: aggregator-svc
+spec:
+  selector:
+    app: aggregator-deploy
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+    

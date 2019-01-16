@@ -1,0 +1,40 @@
+{
+    "sourceFormat": "BIGTABLE",
+    "sourceUris": [
+        "https://googleapis.com/bigtable/projects/slavayssiere-sandbox/instances/test-instance/tables/test-table"
+    ],
+    "bigtableOptions": {
+        "columnFamilies" : [
+            {
+                "familyId": "ms",
+                "columns": [
+                    {
+                        "fieldName": "data",
+                        "qualifierString": "data",
+                        "type": "STRING",
+                        "encoding": "BINARY"
+                    },
+                    {
+                        "fieldName": "user",
+                        "qualifierString": "user",
+                        "type": "STRING",
+                        "encoding": "BINARY"
+                    },
+                    {
+                        "fieldName": "source",
+                        "qualifierString": "source",
+                        "type": "STRING",
+                        "encoding": "BINARY"
+                    },
+                    {
+                        "fieldName": "time",
+                        "qualifierString": "time",
+                        "type": "STRING",
+                        "encoding": "BINARY"
+                    }
+                ]
+            }
+        ]
+    }
+}
+

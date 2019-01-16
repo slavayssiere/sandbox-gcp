@@ -3,7 +3,7 @@
 export PROJECT_ID="slavayssiere-sandbox"
 export SUB_NAME="projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"
 export SECRET_PATH="/Users/slavayssiere/Code/slavayssiere-sandbox-gcp/iac/sa-pubsub-datastore.json"
-
+export REDIS_HOST="localhost"
 
 docker run -it -p 8080:8080 \
     -e SUB_NAME="projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore" \

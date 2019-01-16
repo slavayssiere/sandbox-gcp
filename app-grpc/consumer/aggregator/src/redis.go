@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"time"
 
@@ -23,7 +22,7 @@ func (s server) countUser(user string) {
 	s.redis.SAdd("list_users", user)
 }
 
-func (s server) getUsersCounter() []libmetier.AggregatedData {
+func (s server) getUsersCounter(limit int) []libmetier.AggregatedData {
 	var ret []libmetier.AggregatedData
 	users, err := s.redis.SMembers("list_users").Result()
 	if err != nil {
@@ -37,11 +36,17 @@ func (s server) getUsersCounter() []libmetier.AggregatedData {
 			log.Println(err)
 		}
 		user.Date = time.Now()
+		ret = append(ret, user)
+		if limit > 0 {
+			if id > limit {
+				break
+			}
+		}
 	}
 	return ret
 }
 
-func (s server) writeMessages(ctx context.Context) {
+func (s server) writeMessagesToRedis() {
 
 	for {
 		mess := <-s.messages

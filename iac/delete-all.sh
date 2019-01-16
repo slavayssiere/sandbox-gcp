@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd ../visualizer
+./destroy.sh
+cd -
+
 cd layer-data
 terraform destroy \
     -auto-approve
