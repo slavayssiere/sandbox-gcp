@@ -55,7 +55,8 @@ func (s server) publishmessage(tweet *twitter.Tweet, publishTime chan int64) {
 	message.Data = []byte(b)
 	message.Attributes = make(map[string]string)
 	message.Attributes["source"] = "twitter"
-	message.Attributes["time"] = strconv.FormatInt(start.UnixNano(), 10)
+	message.Attributes["tag"] = *hashtag
+	message.Attributes["injector_time"] = strconv.FormatInt(start.UnixNano(), 10)
 
 	request.Topic = *topicname
 	log.Println("send message to " + *topicname)

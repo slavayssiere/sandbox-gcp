@@ -64,9 +64,17 @@ func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, 
 }
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {
-	if starttime, err := strconv.ParseInt(msg.Attributes["time"], 10, 64); err == nil {
+	normtime, errn := strconv.ParseInt(msg.Attributes["normalizer_time"], 10, 64)
+	if errn == nil {
 		var elapsedTime float64
-		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - starttime)
+		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - normtime)
+		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
+	}
+
+	injectime, erri := strconv.ParseInt(msg.Attributes["normalizer_time"], 10, 64)
+	if erri == nil {
+		var elapsedTime float64
+		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - injectime)
 		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
 	}
 	var ms libmetier.MessageSocial
@@ -74,6 +82,6 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 	if err != nil {
 		log.Println(err)
 	} else {
-		s.messages <- ms
+		s.messages <- (func() (libmetier.MessageSocial, int64, int64) { return ms, normtime, injectime })
 	}
 }

@@ -20,6 +20,7 @@ const (
 	columnNameData   = "data"
 	columnNameUser   = "user"
 	columnNameSource = "source"
+	columnTagSource  = "tag"
 	columnNameDate   = "time"
 )
 
@@ -35,7 +36,7 @@ func sliceContains(list []string, target string) bool {
 
 func bigtableClient(ctx context.Context) bigtable.Client {
 	jsonKey, err := ioutil.ReadFile(*secretpath)
-	config, err := google.JWTConfigFromJSON(jsonKey, bigtable.Scope) // or bigtable.AdminScope, etc. 
+	config, err := google.JWTConfigFromJSON(jsonKey, bigtable.Scope) // or bigtable.AdminScope, etc.
 
 	client, err := bigtable.NewClient(ctx, *projectid, *instanceid, option.WithTokenSource(config.TokenSource(ctx)))
 	if err != nil {
@@ -54,6 +55,7 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	mut.Set(columnFamilyName, columnNameData, bigtable.Now(), []byte(mess.Data))
 	mut.Set(columnFamilyName, columnNameUser, bigtable.Now(), []byte(mess.User))
 	mut.Set(columnFamilyName, columnNameSource, bigtable.Now(), []byte(mess.Source))
+	mut.Set(columnFamilyName, columnTagSource, bigtable.Now(), []byte(mess.Tag))
 
 	b := make([]byte, 8)
 	binary.LittleEndian.PutUint64(b, uint64(mess.Date.Nanosecond()))

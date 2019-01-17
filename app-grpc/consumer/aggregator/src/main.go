@@ -55,7 +55,7 @@ var (
 type server struct {
 	sub pubsub.SubscriberClient
 	ds *datastore.Client
-	messages chan libmetier.MessageSocial
+	messages chan func () (libmetier.MessageSocial, int64, int64)
 	timeProm *prometheus.HistogramVec
 	redis *redis.Client
 	ctx context.Context
@@ -72,7 +72,7 @@ func main() {
 	log.Println("Get secret from: " + *secretpath)
 	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
 	s.ds = datastoreClient(s.ctx)
-	s.messages = make(chan libmetier.MessageSocial)
+	s.messages = make(chan func () (libmetier.MessageSocial, int64, int64))
 	s.timeProm = promHistogramVec()
 	s.redis = redisNew()
 
@@ -109,13 +109,22 @@ func main() {
 		Handler(handlerUsers)
 
 
-	var handlerPostUsers http.Handler
-	handlerPostUsers = LoggerMiddleware(s.handlerPostUsersFunc, "users_post")
+	var handlerTopTen http.Handler
+	handlerTopTen = LoggerMiddleware(s.handlerTopTenFunc, "top_ten")
 	router.
 		Methods("POST").
-		Path("/create").
-		Name("users_post").
-		Handler(handlerPostUsers)
+		Path("/top10").
+		Name("top_ten").
+		Handler(handlerTopTen)
+
+
+	var handlerStats http.Handler
+	handlerStats = LoggerMiddleware(s.handlerStatsFunc, "stats")
+	router.
+		Methods("POST").
+		Path("/stats").
+		Name("stats").
+		Handler(handlerStats)
 
 	router.Methods("GET").Path("/metrics").Name("Metrics").Handler(promhttp.Handler())
 

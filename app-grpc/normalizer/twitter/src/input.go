@@ -46,7 +46,7 @@ func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, 
 }
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {
-	if starttime, err := strconv.ParseInt(msg.Attributes["time"], 10, 64); err != nil {
+	if starttime, err := strconv.ParseInt(msg.Attributes["injector_time"], 10, 64); err != nil {
 		log.Println(err)
 	} else {
 		var elapsedTime float64
@@ -54,11 +54,12 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 		s.timeProm.WithLabelValues("time").Observe(elapsedTime)
 
 		var tweet twitter.Tweet
+		tag := msg.Attributes["tag"]
 		err := json.Unmarshal(msg.Data, &tweet)
 		if err != nil {
 			log.Println(err)
 		} else {
-			s.tweetStream <- tweet
+			s.tweetStream <- (func() (twitter.Tweet, int64, string) { return tweet, starttime, tag })
 		}
 	}
 }

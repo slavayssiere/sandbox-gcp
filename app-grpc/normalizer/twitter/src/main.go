@@ -27,21 +27,22 @@ var (
 type server struct {
 	pub         pubsub.PublisherClient
 	sub         pubsub.SubscriberClient
-	tweetStream chan twitter.Tweet
-	msgStream chan libmetier.MessageSocial
+	tweetStream chan func () (twitter.Tweet, int64, string)
+	msgStream chan func () (libmetier.MessageSocial, int64)
 	timeProm        *prometheus.HistogramVec
 }
 
 func (s server) convert() {
 	for {
-		tweet := <- s.tweetStream 
+		tweet, starttime, tag := (<- s.tweetStream)()
 		var u libmetier.MessageSocial
 		u.Data = tweet.Text
 		u.User = tweet.User.Name
 		log.Println(tweet.User)
 		u.Source = "twitter"
+		u.Tag = tag
 		log.Println(u)
-		s.msgStream <- u
+		s.msgStream <- (func() (libmetier.MessageSocial, int64) { return u, starttime })
 	}
 }
 
@@ -55,8 +56,8 @@ func main() {
 	s.pub = connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	s.sub = connexionSubcriber("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 
-	s.tweetStream = make(chan twitter.Tweet)
-	s.msgStream = make(chan libmetier.MessageSocial)
+	s.tweetStream = make(chan func()(twitter.Tweet, int64, string))
+	s.msgStream = make(chan func()(libmetier.MessageSocial, int64))
 
 	s.timeProm = getPromTime()
 

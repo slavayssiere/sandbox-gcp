@@ -6,8 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strconv"
-	"time"
 
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
@@ -64,11 +62,6 @@ func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, 
 }
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {
-	if starttime, err := strconv.ParseInt(msg.Attributes["time"], 10, 64); err == nil {
-		var elapsedTime float64
-		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - starttime)
-		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
-	}
 	var ms libmetier.MessageSocial
 	err := json.Unmarshal(msg.Data, &ms)
 	if err != nil {

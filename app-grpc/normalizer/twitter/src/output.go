@@ -13,7 +13,7 @@ func (s server) sendMessage() {
 
 	for {
 		log.Println("Wait for msgSTream...")
-		msg := <-s.msgStream
+		msg, starttime := (<-s.msgStream)()
 
 		var message pubsub.PubsubMessage
 		b, err := json.Marshal(msg)
@@ -23,7 +23,8 @@ func (s server) sendMessage() {
 		message.Data = []byte(b)
 		message.Attributes = make(map[string]string)
 		message.Attributes["source"] = "twitter"
-		message.Attributes["time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
+		message.Attributes["injector_time"] = strconv.FormatInt(starttime, 10)
+		message.Attributes["normalizer_time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
 
 		s.publishmessage(&message)
 	}

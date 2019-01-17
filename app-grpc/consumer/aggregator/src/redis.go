@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -46,12 +47,80 @@ func (s server) getUsersCounter(limit int) []libmetier.AggregatedData {
 	return ret
 }
 
+func (s server) addNormTime(normtime int64) {
+	s.redis.LPush("normTimes_"+string(s.getNbAggregation()), normtime)
+}
+
+func (s server) addInjectTime(injectime int64) {
+	s.redis.LPush("injectTimes_"+string(s.getNbAggregation()), injectime)
+}
+
+func (s server) addAggTime(aggtime int64) {
+	s.redis.LPush("aggTimes_"+string(s.getNbAggregation()), aggtime)
+}
+
+func (s server) getMeanTimes(key string, aggrega int64) (float64, int64) {
+	nb, erra := s.redis.LLen(key + string(aggrega)).Result()
+	if erra != nil {
+		log.Println(erra)
+	}
+	val, errb := s.redis.LRange(key+string(aggrega), 0, nb).Result()
+	if errb != nil {
+		log.Println(errb)
+	}
+	s.redis.Del(key + string(aggrega))
+	var sum int64
+	var i int64
+	sum = 0
+	for i = 0; i != nb; i++ {
+		tmp, _ := strconv.ParseInt(val[i], 10, 64)
+		sum = sum + tmp
+	}
+	var ret float64
+	ret = (float64(sum) / float64(nb))
+	return ret, nb
+}
+
+// Aggrega test
+type Aggrega struct {
+	InjectorMean   float64 `json:"mean_time_injector" datastore:"mt_inj"`
+	InjectorNb     int64   `json:"count_injector" datastore:"nb_inj"`
+	NormalizerMean float64 `json:"mean_time_normalizer" datastore:"mt_nor"`
+	NormalizerNb   int64   `json:"count_normalizer" datastore:"nb_nor"`
+}
+
+func (s server) computeAggregas() (Aggrega, int64) {
+	var agg Aggrega
+
+	aggrega := s.getNbAggregation()
+	s.addAggregation()
+
+	agg.InjectorMean, agg.InjectorNb = s.getMeanTimes("injectTimes_", aggrega)
+	agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes("normTimes_", aggrega)
+
+	return agg, aggrega
+}
+
+func (s server) addAggregation() {
+	s.redis.Incr("aggregas")
+}
+
+func (s server) getNbAggregation() int64 {
+	nb, err := s.redis.Get("aggregas").Int64()
+	if err != nil {
+		log.Println(err)
+	}
+	return nb
+}
+
 func (s server) writeMessagesToRedis() {
 
 	for {
-		mess := <-s.messages
+		mess, normtime, injectime := (<-s.messages)()
 		if len(mess.User) > 0 {
 			s.countUser(mess.User)
 		}
+		s.addNormTime(time.Now().UnixNano() - normtime)
+		s.addInjectTime(time.Now().UnixNano() - injectime)
 	}
 }

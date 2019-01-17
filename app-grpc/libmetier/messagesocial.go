@@ -11,6 +11,7 @@ type MessageSocial struct {
 	Data   string    `json:"data"`
 	User   string    `json:"user"`
 	Source string    `json:"source"`
+	Tag    string    `json:"tag"`
 	Date   time.Time `json:"timestamp"`
 }
 

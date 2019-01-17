@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.4
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.5
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -82,7 +82,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /stats
+      - path: /aggregator
         backend:
           serviceName: aggregator-svc
           servicePort: 8080
