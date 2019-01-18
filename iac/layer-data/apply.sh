@@ -28,8 +28,8 @@ gcloud beta scheduler jobs create pubsub aggregator-stats-call \
 
 
 gcloud beta scheduler jobs create pubsub aggregator-dataset-call \
-    --description="Launch job to create aggregas" \
-    --schedule="*/5 * * * *" \
+    --description="Launch job to create dataset" \
+    --schedule="0 0 * * *" \
     --topic="projects/slavayssiere-sandbox/topics/aggregator-queue" \
     --message-body-from-file=./message-stats-dataset.json
 
