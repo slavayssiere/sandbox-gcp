@@ -22,11 +22,13 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.5
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.11
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"
+        - name: SUB_AGGREGA 
+          value: "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-datastore.json"
         - name: REDIS_HOST

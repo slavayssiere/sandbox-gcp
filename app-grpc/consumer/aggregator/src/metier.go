@@ -2,9 +2,20 @@ package main
 
 import (
 	"sort"
+	"time"
 
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 )
+
+// Aggrega test
+type Aggrega struct {
+	InjectorMean   float64   `json:"mean_time_injector" datastore:"mt_inj"`
+	InjectorNb     int64     `json:"count_injector" datastore:"nb_inj"`
+	NormalizerMean float64   `json:"mean_time_normalizer" datastore:"mt_nor"`
+	NormalizerNb   int64     `json:"count_normalizer" datastore:"nb_nor"`
+	Num            int64     `json:"id" datastore:"num"`
+	CreateTime     time.Time `json:"create" datastore:"create_timestamp"`
+}
 
 func (s server) top10() []libmetier.AggregatedData {
 	count := func(p1, p2 *libmetier.AggregatedData) bool {

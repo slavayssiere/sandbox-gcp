@@ -50,6 +50,7 @@ var (
 	subname        = flag.String("sub-name", os.Getenv("SUB_NAME"), "Twitter hashtag")
 	secretpath     = flag.String("secret-path", os.Getenv("SECRET_PATH"), "Twitter hashtag")
 	redisaddr      = flag.String("redis-address", os.Getenv("REDIS_HOST")+":6379", "The address to listen on for HTTP requests.")
+	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "Twitter hashtag")
 )
 
 type server struct {
@@ -77,7 +78,8 @@ func main() {
 	s.redis = redisNew()
 
 	println("launch consume thread")
-	go s.consumemessage()
+	go s.consumeMessageSocial()
+	go s.consumeAggregatorMsg()
 
 	println("write in redis")
 	go s.writeMessagesToRedis()
@@ -125,6 +127,15 @@ func main() {
 		Path("/stats").
 		Name("stats").
 		Handler(handlerStats)
+
+	
+	var handlerStatsID http.Handler
+	handlerStatsID = LoggerMiddleware(s.handlerStatsIDFunc, "stats_id")
+	router.
+		Methods("GET").
+		Path("/stats/{id}").
+		Name("stats_id").
+		Handler(handlerStatsID)
 
 	router.Methods("GET").Path("/metrics").Name("Metrics").Handler(promhttp.Handler())
 

@@ -28,7 +28,7 @@ spec:
         - name: TOPIC_NAME
           value: "projects/slavayssiere-sandbox/topics/twitter-raw"
         - name: HASHTAG
-          value: "#GiletsJaunes"
+          value: "#Souillac"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-publisher.json"
         - name: CONSUMER_KEY

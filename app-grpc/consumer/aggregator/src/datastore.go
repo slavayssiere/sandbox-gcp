@@ -30,6 +30,17 @@ func (s server) writeAggrega(table string, agg Aggrega) {
 	}
 }
 
+func (s server) getStatbyID(id int64) Aggrega{
+	var ret []Aggrega
+
+	q := datastore.NewQuery("aggregas").Filter("num=",id)
+	_, err := s.ds.GetAll(s.ctx, q, &ret)
+	if err != nil {
+		log.Printf("datastore: could not list Aggrega: %v", err)
+	}
+
+	return ret[0]
+}
 
 func (s server) writeBulkMessage(ads []libmetier.AggregatedData) {
 	// Saves the new entity.

@@ -20,7 +20,16 @@ gcloud beta bigtable instances create $BT_INSTANCE \
 cbt -instance $BT_INSTANCE createtable $BT_TABLE
 cbt -instance $BT_INSTANCE createfamily $BT_TABLE ms
 
-gcloud beta scheduler jobs create http aggregator-call \
+gcloud beta scheduler jobs create pubsub aggregator-stats-call \
+    --description="Launch job to create aggregas" \
     --schedule="*/5 * * * *" \
-    --uri="http://private.gcp.wescale/stats" \
-    --http-method=POST
+    --topic="projects/slavayssiere-sandbox/topics/aggregator-queue" \
+    --message-body-from-file=./message-stats-aggregator.json
+
+
+gcloud beta scheduler jobs create pubsub aggregator-dataset-call \
+    --description="Launch job to create aggregas" \
+    --schedule="*/5 * * * *" \
+    --topic="projects/slavayssiere-sandbox/topics/aggregator-queue" \
+    --message-body-from-file=./message-stats-dataset.json
+

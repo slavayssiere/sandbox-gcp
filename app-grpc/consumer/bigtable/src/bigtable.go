@@ -62,7 +62,7 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	mut.Set(columnFamilyName, columnNameDate, bigtable.Now(), b)
 
 	// Read pubsub attribute key to determine BT row key
-	var key = fmt.Sprintf("%s%s", mess.Source, mess.Date)
+	var key = fmt.Sprintf("%s%s%s%d", mess.Source, mess.Tag, mess.User, mess.Date.UnixNano())
 
 	if err := tbl.Apply(ctx, key, mut); err != nil {
 		fmt.Println(err)

@@ -81,24 +81,16 @@ func (s server) getMeanTimes(key string, aggrega int64) (float64, int64) {
 	return ret, nb
 }
 
-// Aggrega test
-type Aggrega struct {
-	InjectorMean   float64 `json:"mean_time_injector" datastore:"mt_inj"`
-	InjectorNb     int64   `json:"count_injector" datastore:"nb_inj"`
-	NormalizerMean float64 `json:"mean_time_normalizer" datastore:"mt_nor"`
-	NormalizerNb   int64   `json:"count_normalizer" datastore:"nb_nor"`
-}
-
-func (s server) computeAggregas() (Aggrega, int64) {
+func (s server) computeAggregas() Aggrega {
 	var agg Aggrega
 
-	aggrega := s.getNbAggregation()
+	agg.Num = s.getNbAggregation()
 	s.addAggregation()
 
-	agg.InjectorMean, agg.InjectorNb = s.getMeanTimes("injectTimes_", aggrega)
-	agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes("normTimes_", aggrega)
+	agg.InjectorMean, agg.InjectorNb = s.getMeanTimes("injectTimes_", agg.Num)
+	agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes("normTimes_", agg.Num)
 
-	return agg, aggrega
+	return agg
 }
 
 func (s server) addAggregation() {

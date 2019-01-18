@@ -48,3 +48,15 @@ resource "google_pubsub_subscription" "messages-normalized-sub-datastore" {
 
   ack_deadline_seconds = 20
 }
+
+// aggregator
+resource "google_pubsub_topic" "aggregator-queue" {
+  name = "aggregator-queue"
+}
+
+resource "google_pubsub_subscription" "aggregator-queue-sub" {
+  name  = "aggregator-queue-sub"
+  topic = "${google_pubsub_topic.aggregator-queue.name}"
+
+  ack_deadline_seconds = 20
+}
