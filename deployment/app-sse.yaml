@@ -101,4 +101,18 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-    
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ws-virtualservice
+  namespace: istio-demo
+spec:
+  hosts:
+  - "istio.gcp-wescale.slavayssiere.fr"
+  gateways:
+  - consumers-gateway
+  http:
+  - route:
+    - destination:
+        host: app-sse-svc
