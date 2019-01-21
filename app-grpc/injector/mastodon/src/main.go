@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/x509"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -30,7 +29,7 @@ func connexionPublisher(address string, filename string, scope ...string) pubsub
 	pool, _ := x509.SystemCertPool()
 	// error handling omitted
 	creds := credentials.NewClientTLSFromCert(pool, "")
-	fmt.Printf("Secret in %s\n", filename)
+	log.Printf("Secret in %s\n", filename)
 	perRPC, _ := oauth.NewServiceAccountFromFile(filename, "https://www.googleapis.com/auth/pubsub")
 	conn, _ := grpc.Dial(
 		"pubsub.googleapis.com:443",
@@ -57,7 +56,7 @@ func publishmessage(maStatus *mastodon.Status, client pubsub.PublisherClient, pu
 	request.Messages = append(request.Messages, &message)
 
 	if _, err := client.Publish(ctx, &request); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		println("error")
 	}
 

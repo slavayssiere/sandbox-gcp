@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"crypto/x509"
-	"fmt"
 	"log"
 
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
@@ -74,6 +73,6 @@ func (s server) publishmessage(mess *pubsub.PubsubMessage) {
 	ctx := context.Background()
 
 	if _, err := s.pub.Publish(ctx, &request); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }

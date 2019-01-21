@@ -35,7 +35,8 @@ gcloud projects remove-iam-policy-binding $GCP_PROJECT --member serviceAccount:s
 ## for aggregator
 gcloud projects remove-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com --role roles/pubsub.subscriber
 gcloud projects remove-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner
-
+##for bastion
+gcloud projects remove-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-bastion@$GCP_PROJECT.iam.gserviceaccount.com --role roles/container.clusterAdmin
 
 gcloud -q iam service-accounts delete "sa-pubsub-publisher@$GCP_PROJECT.iam.gserviceaccount.com"
 gcloud -q iam service-accounts delete "sa-pubsub-subscriber@$GCP_PROJECT.iam.gserviceaccount.com"
@@ -43,3 +44,4 @@ gcloud -q iam service-accounts delete "sa-pubsub-full@$GCP_PROJECT.iam.gservicea
 gcloud -q iam service-accounts delete "sa-aggregator@$GCP_PROJECT.iam.gserviceaccount.com"
 gcloud -q iam service-accounts delete "sa-pubsub-bigtable@$GCP_PROJECT.iam.gserviceaccount.com"
 gcloud -q iam service-accounts delete "sa-pubsub-datastore@$GCP_PROJECT.iam.gserviceaccount.com"
+gcloud -q iam service-accounts delete "sa-bastion@$GCP_PROJECT.iam.gserviceaccount.com"

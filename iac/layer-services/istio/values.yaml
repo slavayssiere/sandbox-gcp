@@ -6,7 +6,7 @@ global:
   hub: docker.io/istio
 
   # Default tag for Istio images.
-  tag: 1.0.3
+  tag: 1.0.5
 
   # Gateway used for legacy k8s Ingress resources. By default it is
   # using 'istio:ingress', to match 0.8 config. It requires that
@@ -67,7 +67,7 @@ global:
     # example: includeIPRanges: "172.30.0.0/16,172.20.0.0/16"
     # would only capture egress traffic on those two IP Ranges, all other outbound traffic would
     # be allowed by the sidecar
-    includeIPRanges: "10.0.0.0/16,10.1.0.0/16"
+    includeIPRanges: "*"
     excludeIPRanges: ""
 
     # istio ingress capture whitelist
@@ -239,7 +239,7 @@ gateways:
     cpu:
       targetAverageUtilization: 80
     loadBalancerIP: ""
-    serviceAnnotations:
+    serviceAnnotations: 
       external-dns.alpha.kubernetes.io/hostname: istio.gcp-wescale.slavayssiere.fr
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
@@ -325,7 +325,7 @@ gateways:
       #  cpu: 1800m
       #  memory: 256Mi
     cpu:
-      targetAverageUtilization: 80      
+      targetAverageUtilization: 80
     loadBalancerIP: ""
     serviceAnnotations:
       cloud.google.com/load-balancer-type: "internal"
@@ -445,6 +445,7 @@ grafana:
     tag: 5.2.3
   persist: false
   storageClassName: ""
+  accessMode: ReadWriteMany
   security:
     enabled: false
     adminUser: admin
@@ -542,7 +543,7 @@ kiali:
   enabled: false
   replicaCount: 1
   hub: docker.io/kiali
-  tag: v0.9
+  tag: v0.10
   ingress:
     enabled: false
     ## Used to create an Ingress record.

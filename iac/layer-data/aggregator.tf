@@ -7,6 +7,8 @@ resource "google_redis_instance" "aggregator" {
 
   authorized_network = "demo-net"
 
+  reserved_ip_range = "10.2.0.0/29"
+
   redis_version = "REDIS_3_2"
   display_name  = "aggregator-test"
 

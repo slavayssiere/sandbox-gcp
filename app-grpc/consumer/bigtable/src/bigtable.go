@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"encoding/binary"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"time"
+	"fmt"
 
 	"cloud.google.com/go/bigtable"
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
@@ -65,7 +65,7 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	var key = fmt.Sprintf("%s%s%s%d", mess.Source, mess.Tag, mess.User, mess.Date.UnixNano())
 
 	if err := tbl.Apply(ctx, key, mut); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
 

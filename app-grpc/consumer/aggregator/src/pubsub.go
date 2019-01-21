@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
-	"fmt"
+	
 	"log"
 	"strconv"
 	"time"
@@ -47,7 +47,7 @@ func (s server) consumeMessageSocial() {
 	for {
 		resp, err := s.sub.Pull(ctx, &pull)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			s.messageSocialreceive(ctx, resp, pull)
 		}
@@ -109,7 +109,7 @@ func (s server) consumeAggregatorMsg() {
 	for {
 		resp, err := s.sub.Pull(ctx, &pull)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			s.messageAggregatorreceive(ctx, resp, pull)
 		}

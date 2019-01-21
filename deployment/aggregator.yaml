@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.11
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.12
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -103,4 +103,23 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
-    
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: aggregator-virtualservice
+  namespace: consumers
+spec:
+  hosts:
+  - "istio.gcp-wescale.slavayssiere.fr"
+  gateways:
+  - consumers-gateway
+  http:
+  - match:
+    - uri:
+        prefix: "/aggregator"
+    route:
+    - destination:
+        host: aggregator-svc
+
+

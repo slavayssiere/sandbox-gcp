@@ -46,11 +46,11 @@ Aller sur le [site: "http://public.gcp-wescale.slavayssiere.fr"](http://public.g
 #### Génération d'aggregas
 
 ```language-bash
-curl -X POST http://public.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
+curl -X POST http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
 ```
 
 ```language-bash
-curl -X GET http://public.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
+curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
 ```
 
 #### To test datavisualisation

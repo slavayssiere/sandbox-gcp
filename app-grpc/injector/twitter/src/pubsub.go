@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/x509"
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -23,7 +22,7 @@ func (s server) connexionPublisher(address string, filename string, scope ...str
 	}
 
 	creds := credentials.NewClientTLSFromCert(pool, "")
-	fmt.Printf("Secret in %s\n", filename)
+	log.Printf("Secret in %s\n", filename)
 	perRPC, err := oauth.NewServiceAccountFromFile(filename, "https://www.googleapis.com/auth/pubsub")
 	if err != nil {
 		log.Println(err)
@@ -46,6 +45,8 @@ func (s server) publishmessage(tweet *twitter.Tweet, publishTime chan int64) {
 	var request pubsub.PublishRequest
 
 	start := time.Now()
+
+	log.Println(tweet)
 
 	b, err := json.Marshal(tweet)
 	if err != nil {

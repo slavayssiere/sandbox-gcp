@@ -34,6 +34,12 @@ resource "google_container_cluster" "test-cluster" {
       cidr_block   = "195.81.224.200/32"
       display_name = "client3"
     }
+
+    cidr_blocks {
+      cidr_block   = "82.254.196.12/32"
+      display_name = "assos_1"
+    }
+    
   }
 
   min_master_version = "1.11.5-gke.5"

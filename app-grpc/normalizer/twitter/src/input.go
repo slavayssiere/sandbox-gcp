@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -28,7 +27,7 @@ func (s server) consumemessage() {
 		}
 		resp, err := s.sub.Pull(ctx, &pull)
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		} else {
 			s.messagesreceive(ctx, resp, pull)
 		}

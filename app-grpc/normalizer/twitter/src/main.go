@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -75,8 +74,8 @@ func main() {
 	signal.Notify(gracefulStop, syscall.SIGINT)
 	go func() {
 		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v", sig)
-		fmt.Println("Wait for 1 second to finish processing")
+		log.Printf("caught sig: %+v", sig)
+		log.Println("Wait for 1 second to finish processing")
 		time.Sleep(1 * time.Second)
 		os.Exit(0)
 	}()

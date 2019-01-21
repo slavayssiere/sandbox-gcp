@@ -59,7 +59,7 @@ resource "google_compute_instance" "bastion-europe-1b" {
   metadata_startup_script = "${file("${path.cwd}/install-vm.sh")}"
 
   service_account {
-    email  = "bastion-sa@slavayssiere-sandbox.iam.gserviceaccount.com"
+    email  = "sa-bastion@slavayssiere-sandbox.iam.gserviceaccount.com"
     scopes = ["cloud-platform", "compute-rw", "storage-rw"]
   }
 }

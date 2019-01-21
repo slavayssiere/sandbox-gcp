@@ -29,7 +29,7 @@ done
 sleep 10
 
 kubectl create ns monitoring
-helm install stable/prometheus-operator --namespace monitoring
+helm install --name prometheuses stable/prometheus-operator --namespace monitoring
 
 # wget https://storage.googleapis.com/gke-release/istio/release/1.0.3-gke.0/stackdriver/stackdriver-tracing.yaml
 # kubectl apply -f stackdriver-tracing.yaml
@@ -41,12 +41,24 @@ apply_kubectl "traefik-admin"
 apply_kubectl "external-dns"
 apply_kubectl "monitoring"
 
-if [ ! -d "istio-1.0.3" ]; then
-    wget https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-osx.tar.gz
-    tar -xvf istio-1.0.3-osx.tar.gz
-    rm istio-1.0.3-osx.tar.gz
+# if [ ! -d "istio-1.0.3" ]; then
+#     wget https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-osx.tar.gz
+#     tar -xvf istio-1.0.3-osx.tar.gz
+#     rm istio-1.0.3-osx.tar.gz
+# fi
+
+# cd istio-1.0.3 
+#     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio.yaml
+# cd -
+
+if [ ! -d "istio-1.0.5" ]; then
+    wget https://github.com/istio/istio/releases/download/1.0.5/istio-1.0.5-osx.tar.gz
+    tar -xvf istio-1.0.5-osx.tar.gz
+    rm istio-1.0.5-osx.tar.gz
 fi
 
-cd istio-1.0.3 
-    helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ./istio/values-istio.yaml
+cd istio-1.0.5
+    helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values.yaml
 cd -
+
+kubectl apply -f ./istio/config-gcp-services.yaml

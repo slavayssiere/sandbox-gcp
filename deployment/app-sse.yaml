@@ -106,7 +106,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: ws-virtualservice
-  namespace: istio-demo
+  namespace: consumers
 spec:
   hosts:
   - "istio.gcp-wescale.slavayssiere.fr"
