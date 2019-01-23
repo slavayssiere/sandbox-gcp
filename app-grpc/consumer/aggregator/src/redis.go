@@ -31,21 +31,27 @@ func redisNew() *redis.Client {
 	return client
 }
 
-func (s server) countUser(user string) {
-	s.redis.Incr(user)
-	s.redis.SAdd("list_users", user)
+func (s server) countUser(tag string, user string) {
+	s.redis.Incr(user + "_" + tag)
+	s.redis.SAdd("list_users_"+tag, user)
 }
 
-func (s server) getUsersCounter(limit int) []libmetier.AggregatedData {
+// UserCounter UserCounter
+type UserCounter struct {
+	Users []libmetier.AggregatedData `json:"users"`
+	Tag   string                     `json:"tag"`
+}
+
+func (s server) getUsersCounter(tag string, limit int) []libmetier.AggregatedData {
 	var ret []libmetier.AggregatedData
-	users, err := s.redis.SMembers("list_users").Result()
+	users, err := s.redis.SMembers("list_users_" + tag).Result()
 	if err != nil {
 		log.Println(err)
 	}
 	for id := range users {
 		var user libmetier.AggregatedData
 		user.User = users[id]
-		user.Count, err = s.redis.Get(users[id]).Int64()
+		user.Count, err = s.redis.Get(users[id] + "_" + tag).Int64()
 		if err != nil {
 			log.Println(err)
 		}
@@ -60,28 +66,43 @@ func (s server) getUsersCounter(limit int) []libmetier.AggregatedData {
 	return ret
 }
 
-func (s server) addNormTime(normtime int64) {
-	s.redis.LPush("normTimes_"+string(s.getNbAggregation()), normtime)
+func (s server) getUsersCounterList(limit int) []UserCounter {
+	var listUsers []UserCounter
+	tags, err := s.redis.SMembers("tag_list").Result()
+	if err != nil {
+		log.Println(err)
+	}
+	for _, tag := range tags {
+		var uc UserCounter
+		uc.Tag = tag
+		uc.Users = s.getUsersCounter(tag, limit)
+		listUsers = append(listUsers, uc)
+	}
+	return listUsers
 }
 
-func (s server) addInjectTime(injectime int64) {
-	s.redis.LPush("injectTimes_"+string(s.getNbAggregation()), injectime)
+func (s server) addNormTime(tag string, normtime int64) {
+	s.redis.LPush("normTimes_"+tag+"_"+string(s.getNbAggregation()), normtime)
 }
 
-func (s server) addAggTime(aggtime int64) {
-	s.redis.LPush("aggTimes_"+string(s.getNbAggregation()), aggtime)
+func (s server) addInjectTime(tag string, injectime int64) {
+	s.redis.LPush("injectTimes_"+tag+"_"+string(s.getNbAggregation()), injectime)
 }
 
-func (s server) getMeanTimes(key string, aggrega int64) (float64, int64) {
-	nb, erra := s.redis.LLen(key + string(aggrega)).Result()
+func (s server) addAggTime(tag string, aggtime int64) {
+	s.redis.LPush("aggTimes_"+tag+"_"+string(s.getNbAggregation()), aggtime)
+}
+
+func (s server) getMeanTimes(tag string, key string, aggrega int64) (float64, int64) {
+	nb, erra := s.redis.LLen(key + tag + "_" + string(aggrega)).Result()
 	if erra != nil {
 		log.Println(erra)
 	}
-	val, errb := s.redis.LRange(key+string(aggrega), 0, nb).Result()
+	val, errb := s.redis.LRange(key+tag+"_"+string(aggrega), 0, nb).Result()
 	if errb != nil {
 		log.Println(errb)
 	}
-	s.redis.Del(key + string(aggrega))
+	s.redis.Del(key + tag + "_" + string(aggrega))
 	var sum int64
 	var i int64
 	sum = 0
@@ -100,8 +121,14 @@ func (s server) computeAggregas() Aggrega {
 	agg.Num = s.getNbAggregation()
 	s.addAggregation()
 
-	agg.InjectorMean, agg.InjectorNb = s.getMeanTimes("injectTimes_", agg.Num)
-	agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes("normTimes_", agg.Num)
+	tags, err := s.redis.SMembers("tag_list").Result()
+	if err != nil {
+		log.Println(err)
+	}
+	for _, tag := range tags {
+		agg.InjectorMean, agg.InjectorNb = s.getMeanTimes(tag, "injectTimes_", agg.Num)
+		agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes(tag, "normTimes_", agg.Num)
+	}
 
 	agg.CreateTime = time.Now()
 
@@ -120,14 +147,19 @@ func (s server) getNbAggregation() int64 {
 	return nb
 }
 
+func (s server) addTag(tag string) {
+	s.redis.SAdd("tag_list", tag)
+}
+
 func (s server) writeMessagesToRedis() {
 
 	for {
 		mess, normtime, injectime := (<-s.messages)()
+		s.addTag(mess.Tag)
 		if len(mess.User) > 0 {
-			s.countUser(mess.User)
+			s.countUser(mess.Tag, mess.User)
 		}
-		s.addNormTime(time.Now().UnixNano() - normtime)
-		s.addInjectTime(time.Now().UnixNano() - injectime)
+		s.addNormTime(mess.Tag, time.Now().UnixNano()-normtime)
+		s.addInjectTime(mess.Tag, time.Now().UnixNano()-injectime)
 	}
 }

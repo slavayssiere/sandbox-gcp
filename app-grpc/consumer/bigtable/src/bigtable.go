@@ -24,6 +24,7 @@ const (
 	columnNameSource = "source"
 	columnTagSource  = "tag"
 	columnNameDate   = "time"
+	columnSentimentDate   = "sentiment"
 )
 
 // sliceContains reports whether the provided string is present in the given slice of strings.
@@ -58,13 +59,9 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	mut.Set(columnFamilyName, columnNameUser, bigtable.Now(), []byte(mess.User))
 	mut.Set(columnFamilyName, columnNameSource, bigtable.Now(), []byte(mess.Source))
 	mut.Set(columnFamilyName, columnTagSource, bigtable.Now(), []byte(mess.Tag))
+	mut.Set(columnFamilyName, columnNameDate, bigtable.Now(),[]byte(mess.Date.Format(time.RFC3339Nano)))
+	mut.Set(columnFamilyName, columnSentimentDate, bigtable.Now(),[]byte(fmt.Sprintf("%f", mess.Sentiment)))
 
-	b := make([]byte, 8)
-	binary.LittleEndian.PutUint64(b, uint64(mess.Date.Nanosecond()))
-	mut.Set(columnFamilyName, columnNameDate, bigtable.Now(), b)
-
-	// Read pubsub attribute key to determine BT row key
-	//var key = fmt.Sprintf("%s%s%s%d", mess.Source, mess.Tag, mess.User, mess.Date.UnixNano())
 	sha256 := sha256.Sum256([]byte(mess.User))
 
 	key := fmt.Sprintf("%s-%s-%x-%d\n", mess.Source, mess.Tag, sha256, mess.Date.UnixNano())

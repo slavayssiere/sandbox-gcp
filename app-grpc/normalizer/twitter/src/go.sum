@@ -43,6 +43,8 @@ github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190111153954-542
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190111153954-542cc6297d5f/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190117151940-da0da66ff6fe h1:eCPRMuEYdjzLVlSqhHAaErgwA0ZE8qwOEjxL/GoyoDI=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190117151940-da0da66ff6fe/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38 h1:eBSQRlZwNSh/2QxNuQSdmQQBVNuF8ep9O4wMuEbN7lQ=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
 go.opencensus.io v0.18.0 h1:Mk5rgZcggtbvtAun5aJzAtjKKN/t0R3jJPlWILlv938=
 go.opencensus.io v0.18.0/go.mod h1:vKdFvxhtzZ9onBp9VKHK8z/sRpBMnKAsufL7wlDrCOA=
 golang.org/x/lint v0.0.0-20180702182130-06c8688daad7/go.mod h1:UVdnD1Gm6xHRNCYTkRU2/jEulfH38KcIWyp/GAMgvoE=

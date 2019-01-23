@@ -16,7 +16,9 @@ func datastoreClient(ctx context.Context) *datastore.Client {
 	config, err := google.JWTConfigFromJSON(jsonKey, datastore.ScopeDatastore) // or bigtable.AdminScope, etc.
 	client, err := datastore.NewClient(ctx, *projectid, option.WithTokenSource(config.TokenSource(ctx)))
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Printf("Failed to create client: %v\n", err)
+	} else {
+		log.Println("connected to client!")
 	}
 
 	return client
@@ -26,7 +28,7 @@ func (s server) writeAggrega(table string, agg Aggrega) {
 	// Saves the new entity.
 	k := datastore.IncompleteKey(table, nil)
 	if _, err := s.ds.Put(s.ctx, k, &agg); err != nil {
-		log.Fatalf("Failed to save task: %v", err)
+		log.Printf("Failed to save task: %v\n", err)
 	}
 }
 
@@ -59,7 +61,7 @@ func (s server) writeBulkMessage(ads []libmetier.AggregatedData) {
 			adstmp := ads[min:max]
 			kltmp := kl[min:max]
 			if _, err := s.ds.PutMulti(s.ctx, kltmp, adstmp); err != nil {
-				log.Fatalf("Failed to save task: %v", err)
+				log.Printf("Failed to save task: %v\n", err)
 			}
 			min = max+1
 			if max > (len(ads) - 400) {
@@ -73,7 +75,7 @@ func (s server) writeBulkMessage(ads []libmetier.AggregatedData) {
 		}
 	} else {
 		if _, err := s.ds.PutMulti(s.ctx, kl, ads); err != nil {
-			log.Fatalf("Failed to save task: %v", err)
+			log.Printf("Failed to save task: %v\n", err)
 		}
 	}
 }

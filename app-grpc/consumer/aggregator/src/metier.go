@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"sort"
 	"time"
 
@@ -17,19 +18,31 @@ type Aggrega struct {
 	CreateTime     time.Time `json:"create" datastore:"create_timestamp"`
 }
 
-func (s server) top10() []libmetier.AggregatedData {
+func (s server) top10() []UserCounter {
 	count := func(p1, p2 *libmetier.AggregatedData) bool {
 		return p1.Count > p2.Count
 	}
 
-	ads := s.getUsersCounter(-1)
-
-	By(count).Sort(ads)
-
-	if len(ads) > 10 {
-		ads = ads[:10]
+	var listUsers []UserCounter
+	tags, err := s.redis.SMembers("tag_list").Result()
+	if err != nil {
+		log.Println(err)
 	}
-	return ads
+	for _, tag := range tags {
+
+		ads := s.getUsersCounter(tag, -1)
+
+		By(count).Sort(ads)
+
+		if len(ads) > 10 {
+			ads = ads[:10]
+		}
+		var uc UserCounter
+		uc.Tag = tag
+		uc.Users = ads
+		listUsers = append(listUsers, uc)
+	}
+	return listUsers
 }
 
 // By is the type of a "less" function that defines the ordering of users

@@ -56,3 +56,6 @@ curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
 #### To test datavisualisation
 
 Aller sur Google Drive
+
+kubectl create ns test
+kubectl -n test run -i --tty busybox --image=busybox --restart=Never -- sh

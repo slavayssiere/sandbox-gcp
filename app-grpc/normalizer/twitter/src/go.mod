@@ -8,7 +8,7 @@ require (
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/prometheus/client_golang v0.9.2
-	github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190117151940-da0da66ff6fe
+	github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38
 	google.golang.org/api v0.1.0 // indirect
 	google.golang.org/genproto v0.0.0-20181221175505-bd9b4fb69e2f
 	google.golang.org/grpc v1.17.0

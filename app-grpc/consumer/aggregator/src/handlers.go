@@ -11,7 +11,7 @@ import (
 )
 
 func (s server) handlerUsersFunc(w http.ResponseWriter, r *http.Request) {
-	us := s.getUsersCounter(100)
+	us := s.getUsersCounterList(100)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)

@@ -42,6 +42,10 @@ github.com/sirupsen/logrus v1.2.0/go.mod h1:LxeOpSwHxABJmUn/MG1IvRgCAasNZTLOkJPx
 github.com/slavayssiere/sandbox-gcp v0.0.1 h1:yPIgxNIGdfrWf65u94MHOE7nN4g9IfqhjTZkSHbu9Rs=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190111170018-e4f94c91e590 h1:49pw3LmeaIBow7SoLtoKrB4NiPHRRGZWdg88a3xVVms=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190111170018-e4f94c91e590/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123072139-0b50d631825d h1:pKFHVOGcnMi14ES5MkytGTt85g7lK72eVocWGOFz45o=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123072139-0b50d631825d/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38 h1:eBSQRlZwNSh/2QxNuQSdmQQBVNuF8ep9O4wMuEbN7lQ=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
 github.com/stretchr/objx v0.1.1/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 golang.org/x/crypto v0.0.0-20180904163835-0709b304e793/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=

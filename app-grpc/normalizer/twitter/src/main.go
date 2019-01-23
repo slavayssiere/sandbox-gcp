@@ -9,12 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"context"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
+
+
+	language "cloud.google.com/go/language/apiv1"
 )
 
 var (
@@ -27,20 +31,10 @@ type server struct {
 	pub         pubsub.PublisherClient
 	sub         pubsub.SubscriberClient
 	tweetStream chan func () (twitter.Tweet, int64, string)
-	msgStream chan func () (libmetier.MessageSocial, int64)
-	timeProm        *prometheus.HistogramVec
-}
-
-func (s server) convert() {
-	for {
-		tweet, starttime, tag := (<- s.tweetStream)()
-		var u libmetier.MessageSocial
-		u.Data = tweet.Text
-		u.User = tweet.User.Name
-		u.Source = "twitter"
-		u.Tag = tag
-		s.msgStream <- (func() (libmetier.MessageSocial, int64) { return u, starttime })
-	}
+	msgStream   chan func () (libmetier.MessageSocial, int64)
+	timeProm    *prometheus.HistogramVec
+	language    *language.Client
+	ctx         context.Context
 }
 
 func main() {
@@ -48,6 +42,8 @@ func main() {
 	flag.Parse()
 
 	var s server
+
+	s.ctx = context.Background()
 
 	rand.Seed(time.Now().UnixNano())
 	s.pub = connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
@@ -57,6 +53,7 @@ func main() {
 	s.msgStream = make(chan func()(libmetier.MessageSocial, int64))
 
 	s.timeProm = getPromTime()
+	s.language = newNaturalLanguage(s.ctx)
 
 	log.Println("launch converter thread")
 	go s.convert()
