@@ -8,11 +8,12 @@ import (
 
 // MessageSocial a common social msg
 type MessageSocial struct {
-	Data   string    `json:"data"`
-	User   string    `json:"user"`
-	Source string    `json:"source"`
-	Tag    string    `json:"tag"`
-	Date   time.Time `json:"timestamp"`
+	Data      string    `json:"data"`
+	User      string    `json:"user"`
+	Source    string    `json:"source"`
+	Tag       string    `json:"tag"`
+	Date      time.Time `json:"timestamp"`
+	Sentiment float32   `json:"sentiment"`
 }
 
 // ToMessageSocial public function
