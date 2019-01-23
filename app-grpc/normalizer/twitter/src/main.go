@@ -37,10 +37,8 @@ func (s server) convert() {
 		var u libmetier.MessageSocial
 		u.Data = tweet.Text
 		u.User = tweet.User.Name
-		log.Println(tweet.User)
 		u.Source = "twitter"
 		u.Tag = tag
-		log.Println(u)
 		s.msgStream <- (func() (libmetier.MessageSocial, int64) { return u, starttime })
 	}
 }

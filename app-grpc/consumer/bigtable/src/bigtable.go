@@ -12,11 +12,13 @@ import (
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
+	"crypto/sha256"
 )
 
 // User-provided constants.
 const (
 	columnFamilyName = "ms"
+
 	columnNameData   = "data"
 	columnNameUser   = "user"
 	columnNameSource = "source"
@@ -62,7 +64,10 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	mut.Set(columnFamilyName, columnNameDate, bigtable.Now(), b)
 
 	// Read pubsub attribute key to determine BT row key
-	var key = fmt.Sprintf("%s%s%s%d", mess.Source, mess.Tag, mess.User, mess.Date.UnixNano())
+	//var key = fmt.Sprintf("%s%s%s%d", mess.Source, mess.Tag, mess.User, mess.Date.UnixNano())
+	sha256 := sha256.Sum256([]byte(mess.User))
+
+	key := fmt.Sprintf("%s-%s-%x-%d\n", mess.Source, mess.Tag, sha256, mess.Date.UnixNano())
 
 	if err := tbl.Apply(ctx, key, mut); err != nil {
 		log.Println(err)

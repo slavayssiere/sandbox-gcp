@@ -60,3 +60,10 @@ resource "google_pubsub_subscription" "aggregator-queue-sub" {
 
   ack_deadline_seconds = 20
 }
+
+resource "google_pubsub_subscription" "aggregator-queue-sub-dataset" {
+  name  = "aggregator-queue-sub-dataset"
+  topic = "${google_pubsub_topic.aggregator-queue.name}"
+
+  ack_deadline_seconds = 20
+}

@@ -10,11 +10,24 @@ import (
 )
 
 func redisNew() *redis.Client {
-	client := redis.NewClient(&redis.Options{
-		Addr:     *redisaddr,
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
+	var client *redis.Client
+	for {
+		client = redis.NewClient(&redis.Options{
+			Addr:     *redisaddr,
+			Password: "", // no password set
+			DB:       0,  // use default DB
+		})
+
+		_, err := client.Ping().Result()
+		if err != nil {
+			log.Println("error in redis connection to " + *redisaddr)
+			log.Println(err)
+		} else {
+			log.Println("MemoryStore connected !")
+			break
+		}
+	}
+
 	return client
 }
 
@@ -89,6 +102,8 @@ func (s server) computeAggregas() Aggrega {
 
 	agg.InjectorMean, agg.InjectorNb = s.getMeanTimes("injectTimes_", agg.Num)
 	agg.NormalizerMean, agg.NormalizerNb = s.getMeanTimes("normTimes_", agg.Num)
+
+	agg.CreateTime = time.Now()
 
 	return agg
 }

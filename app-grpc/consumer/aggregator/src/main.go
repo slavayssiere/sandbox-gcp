@@ -50,7 +50,8 @@ var (
 	subname        = flag.String("sub-name", os.Getenv("SUB_NAME"), "Twitter hashtag")
 	secretpath     = flag.String("secret-path", os.Getenv("SECRET_PATH"), "Twitter hashtag")
 	redisaddr      = flag.String("redis-address", os.Getenv("REDIS_HOST")+":6379", "The address to listen on for HTTP requests.")
-	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "Twitter hashtag")
+	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "subscription for cloud scheduler")
+	pathprefix     = flag.String("path-prefix", os.Getenv("PATH_PREFIX"), "Path prefix")
 )
 
 type server struct {
@@ -77,11 +78,11 @@ func main() {
 	s.timeProm = promHistogramVec()
 	s.redis = redisNew()
 
-	println("launch consume thread")
+	log.Println("launch consume thread")
 	go s.consumeMessageSocial()
 	go s.consumeAggregatorMsg()
 
-	println("write in redis")
+	log.Println("write in redis")
 	go s.writeMessagesToRedis()
 
 	router := mux.NewRouter().StrictSlash(true)
@@ -90,7 +91,7 @@ func main() {
 	handlerStatus = LoggerMiddleware(libmetier.HandlerStatusFunc, "root")
 	router.
 		Methods("GET").
-		Path("/").
+		Path(*pathprefix + "/").
 		Name("root").
 		Handler(handlerStatus)
 
@@ -106,7 +107,7 @@ func main() {
 	handlerUsers = LoggerMiddleware(s.handlerUsersFunc, "users_get")
 	router.
 		Methods("GET").
-		Path("/users").
+		Path(*pathprefix + "/users").
 		Name("users_get").
 		Handler(handlerUsers)
 
@@ -115,7 +116,7 @@ func main() {
 	handlerTopTen = LoggerMiddleware(s.handlerTopTenFunc, "top_ten")
 	router.
 		Methods("POST").
-		Path("/top10").
+		Path(*pathprefix + "/top10").
 		Name("top_ten").
 		Handler(handlerTopTen)
 
@@ -124,7 +125,7 @@ func main() {
 	handlerStats = LoggerMiddleware(s.handlerStatsFunc, "stats")
 	router.
 		Methods("POST").
-		Path("/stats").
+		Path(*pathprefix + "/stats").
 		Name("stats").
 		Handler(handlerStats)
 
@@ -133,7 +134,7 @@ func main() {
 	handlerStatsID = LoggerMiddleware(s.handlerStatsIDFunc, "stats_id")
 	router.
 		Methods("GET").
-		Path("/stats/{id}").
+		Path(*pathprefix + "/stats/{id}").
 		Name("stats_id").
 		Handler(handlerStatsID)
 

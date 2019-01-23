@@ -48,7 +48,7 @@ apply_kubectl "monitoring"
 # fi
 
 # cd istio-1.0.3 
-#     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio.yaml
+#     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio-1.0.3.yaml
 # cd -
 
 if [ ! -d "istio-1.0.5" ]; then
@@ -58,7 +58,8 @@ if [ ! -d "istio-1.0.5" ]; then
 fi
 
 cd istio-1.0.5
-    helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values.yaml
+    helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio-1.0.5.yaml
 cd -
 
-kubectl apply -f ./istio/config-gcp-services.yaml
+## delete istio CRD
+# kubectl delete customresourcedefinitions $(kubectl get customresourcedefinitions | cut -d ' ' -f1 | grep istio.io)

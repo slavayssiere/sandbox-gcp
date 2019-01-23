@@ -44,8 +44,7 @@ func (s server) handlerStatsFunc(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	ret.Agg = s.computeAggregas()
 	s.writeAggrega("aggregas", ret.Agg)
-	t := time.Now()
-	ret.Elapsed = int64(t.Sub(start))
+	ret.Elapsed = int64(ret.Agg.CreateTime.Sub(start))
 	ret.Status = "done"
 
 	//convert to ms

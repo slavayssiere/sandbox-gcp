@@ -23,6 +23,7 @@ var (
 	tableid        = flag.String("table-id", os.Getenv("TABLE_ID"), "Twitter hashtag")
 	subname        = flag.String("sub-name", os.Getenv("SUB_NAME"), "Twitter hashtag")
 	secretpath     = flag.String("secret-path", os.Getenv("SECRET_PATH"), "Twitter hashtag")
+	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "subscription for cloud scheduler")
 )
 
 type server struct {
@@ -46,10 +47,11 @@ func main() {
 	s.messages = make(chan libmetier.MessageSocial)
 	s.timeProm = promHistogramVec()
 
-	println("launch consume thread")
+	log.Println("launch consume thread")
 	go s.consumemessage()
+	go s.consumeAggregatorMsg()
 
-	println("write in bigtable")
+	log.Println("write in bigtable")
 	go s.writeMessages(ctx)
 
 	http.Handle("/metrics", promhttp.Handler())

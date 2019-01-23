@@ -32,3 +32,17 @@ func (tc twitterClient) filterTwitter(hashtag string) *twitter.Stream {
 
 	return strm
 }
+
+func (s server) reconnectStream(tc *twitterClient) {
+	for {
+		log.Println("wait for error")
+		test := <-s.streamError
+		if test {
+			log.Println("error receive")
+			tc.strm.Stop()
+			log.Println("Re-Create filter")
+			tc.strm = (*tc).filterTwitter(*hashtag)
+			go (*tc).demux.HandleChan(tc.strm.Messages)
+		}
+	}
+}

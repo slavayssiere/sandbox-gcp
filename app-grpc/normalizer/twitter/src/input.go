@@ -54,6 +54,7 @@ func (s server) msgreceive(msg *pubsub.PubsubMessage) {
 
 		var tweet twitter.Tweet
 		tag := msg.Attributes["tag"]
+		log.Println("Tag: " + tag)
 		err := json.Unmarshal(msg.Data, &tweet)
 		if err != nil {
 			log.Println(err)

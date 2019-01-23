@@ -31,6 +31,12 @@
                         "qualifierString": "time",
                         "type": "STRING",
                         "encoding": "BINARY"
+                    },
+                    {
+                        "fieldName": "tag",
+                        "qualifierString": "tag",
+                        "type": "STRING",
+                        "encoding": "BINARY"
                     }
                 ]
             }

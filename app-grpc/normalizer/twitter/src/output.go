@@ -22,7 +22,6 @@ func (s server) sendMessage() {
 		}
 		message.Data = []byte(b)
 		message.Attributes = make(map[string]string)
-		message.Attributes["source"] = "twitter"
 		message.Attributes["injector_time"] = strconv.FormatInt(starttime, 10)
 		message.Attributes["normalizer_time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
 

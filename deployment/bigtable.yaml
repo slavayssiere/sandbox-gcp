@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-bt
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.9
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.11
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -35,6 +35,11 @@ spec:
           value: "test-table"
         - name: INSTANCE_ID
           value: "test-instance"
+        - name: SUB_AGGREGA 
+          value: "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub-dataset"
+        ports:
+        - containerPort: 8080
+          name: http
         resources:
           requests:
             memory: 50M

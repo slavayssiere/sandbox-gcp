@@ -30,6 +30,7 @@ type server struct {
 	publishTimeChan chan int64
 	timeInjectors   *prometheus.HistogramVec
 	countInjectors  *prometheus.CounterVec
+	streamError     chan bool
 }
 
 type twitterClient struct {
@@ -49,6 +50,7 @@ func main() {
 	// Client
 	s.ps = s.connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	s.publishTimeChan = make(chan int64)
+	s.streamError = make(chan bool)
 
 	//twitter
 	tc.clt = newTwitter(consumerKey, consumerSecret, accessToken, accessSecret)
@@ -72,9 +74,43 @@ func main() {
 			log.Printf("Tweet null")
 		}
 	}
-	// Receive messages until stopped or stream quits
+
+	tc.demux.Warning = func(warning *twitter.StallWarning) {
+		if warning != nil {
+			log.Println("Warning")
+			log.Println(warning)
+			s.streamError <- true
+		} else {
+			log.Printf("warning null")
+		}
+	}
+
+	tc.demux.StreamDisconnect = func(disconnect *twitter.StreamDisconnect) {
+		if disconnect != nil {
+			log.Println("StreamDisconnect")
+			log.Println(disconnect)
+			s.streamError <- true
+		} else {
+			log.Printf("disconnect null")
+		}
+	}
+
+	tc.demux.Other = func(message interface{}) {
+		if message != nil {
+			log.Println("Other")
+			log.Println(message)
+			s.streamError <- true
+		} else {
+			log.Printf("message null")
+		}
+	}
+
+	log.Println("Create filter")
 	tc.strm = tc.filterTwitter(*hashtag)
 	go tc.demux.HandleChan(tc.strm.Messages)
+
+	// Receive messages until stopped or stream quits
+	go s.reconnectStream(&tc)
 
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
@@ -89,6 +125,7 @@ func main() {
 		os.Exit(0)
 	}()
 
+	log.Println("launch server...")
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
 

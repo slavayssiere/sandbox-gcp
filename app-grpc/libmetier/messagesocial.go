@@ -15,14 +15,18 @@ type MessageSocial struct {
 	Date   time.Time `json:"timestamp"`
 }
 
-func (ms MessageSocial) toMessageSocial(mstpl []byte) {
+// ToMessageSocial public function
+func ToMessageSocial(mstpl []byte) MessageSocial {
+	var ms MessageSocial
 	err := json.Unmarshal(mstpl, &ms)
 	if err != nil {
 		log.Println(err)
 	}
+	return ms
 }
 
-func (ms MessageSocial) toByteArray() []byte {
+// ToByteArray another public function
+func (ms MessageSocial) ToByteArray() []byte {
 	b, err := json.Marshal(ms)
 	if err != nil {
 		log.Println(err)

@@ -21,6 +21,7 @@ ENV TABLE_ID "test-table"
 ENV INSTANCE_ID "test-instance"
 ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-bigtable"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
+ENV SUB_AGGREGA "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub-dataset"
 ENV PROM_PORT 8080
 
 WORKDIR /app

@@ -57,7 +57,6 @@ func publishmessage(maStatus *mastodon.Status, client pubsub.PublisherClient, pu
 
 	if _, err := client.Publish(ctx, &request); err != nil {
 		log.Println(err)
-		println("error")
 	}
 
 	t := time.Now()

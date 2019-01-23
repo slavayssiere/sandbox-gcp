@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.12
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.18
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -33,6 +33,11 @@ spec:
           value: "/secret/sa-pubsub-datastore.json"
         - name: REDIS_HOST
           value: redis.gcp.wescale
+        - name: PATH_PREFIX
+          value: "/aggregator"
+        ports:
+        - containerPort: 8080
+          name: http
         resources:
           requests:
             memory: 50M
@@ -103,6 +108,7 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      name: http
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService

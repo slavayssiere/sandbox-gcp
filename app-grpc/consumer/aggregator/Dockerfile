@@ -13,7 +13,7 @@ COPY src .
 RUN go install
 
 # final stage
-FROM alpine
+FROM alpine:3.8
 RUN apk add --no-cache curl ca-certificates
 VOLUME /secret
 ENV PROJECT_ID "slavayssiere-sandbox"

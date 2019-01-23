@@ -26,6 +26,7 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+          name: http
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub"
@@ -101,11 +102,12 @@ spec:
     - protocol: TCP
       port: 8080
       targetPort: 8080
+      name: http
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: ws-virtualservice
+  name: app-sse-virtualservice
   namespace: consumers
 spec:
   hosts:
