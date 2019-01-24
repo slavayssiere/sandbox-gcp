@@ -12,3 +12,5 @@ datastoreReadGqlQuery="SELECT * FROM aggregas",\
 datastoreReadProjectId="slavayssiere-sandbox",\
 datastoreDeleteProjectId="slavayssiere-sandbox"
 
+terraform destroy \
+    -auto-approve
