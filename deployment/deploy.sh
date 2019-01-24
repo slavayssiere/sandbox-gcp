@@ -13,6 +13,14 @@ kubectl create secret generic twitter-secrets \
     --from-literal=ACCESS_SECRET=$ACCESS_SECRET \
     -n injectors
 
+kubectl create secret generic mastodon-secrets \
+    --from-literal=MASTODON_SERVER=$MASTODON_SERVER \
+    --from-literal=MASTODON_CLIENT_ID=$MASTODON_CLIENT_ID \
+    --from-literal=MASTODON_CLIENT_SECRET=$MASTODON_CLIENT_SECRET \
+    --from-literal=MASTODON_LOGIN=$MASTODON_LOGIN \
+    --from-literal=MASTODON_PASSWORD=$MASTODON_PASSWORD \
+    -n injectors
+
 kubectl create secret generic sa-pubsub-publisher \
     --from-file=../iac/sa-pubsub-publisher.json \
     -n injectors

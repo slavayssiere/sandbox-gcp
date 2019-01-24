@@ -53,6 +53,11 @@ curl -X POST http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
 curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
 ```
 
+
+```language-bash
+curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/top10 | jq .
+```
+
 #### To test datavisualisation
 
 Aller sur Google Drive

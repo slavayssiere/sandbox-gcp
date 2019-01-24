@@ -128,5 +128,4 @@ func main() {
 	log.Println("launch server...")
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
-
 }

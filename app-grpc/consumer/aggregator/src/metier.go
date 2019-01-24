@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"sort"
 	"time"
@@ -19,6 +20,21 @@ type Aggrega struct {
 }
 
 func (s server) top10() []UserCounter {
+	var listUsers []UserCounter
+	var err error
+	var lu string
+	lu, err = s.redis.Get("top10").Result()
+	if err != nil {
+		log.Println(err)
+	}
+	err = json.Unmarshal([]byte(lu), &listUsers)
+	if err != nil {
+		log.Println(err)
+	}
+	return listUsers
+}
+
+func (s server) top10gen() {
 	count := func(p1, p2 *libmetier.AggregatedData) bool {
 		return p1.Count > p2.Count
 	}
@@ -42,7 +58,13 @@ func (s server) top10() []UserCounter {
 		uc.Users = ads
 		listUsers = append(listUsers, uc)
 	}
-	return listUsers
+
+	b, err := json.Marshal(listUsers)
+	if err != nil {
+		log.Println(err)
+	}
+
+	s.redis.Set("top10", b, 0)
 }
 
 // By is the type of a "less" function that defines the ordering of users

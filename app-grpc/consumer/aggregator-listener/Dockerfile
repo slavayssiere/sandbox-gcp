@@ -13,21 +13,17 @@ COPY src .
 RUN go install
 
 # final stage
-FROM alpine
+FROM alpine:3.8
 RUN apk add --no-cache curl ca-certificates
 VOLUME /secret
-ENV PROM_PORT 8080
-ENV TOPIC_NAME "projects/slavayssiere-sandbox/topics/mastodon-raw"
+ENV PROJECT_ID "slavayssiere-sandbox"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
-ENV HASHTAG "#GiletsJaunes"
-ENV MASTODON_SERVER "https://linuxrocks.online"
-ENV MASTODON_CLIENT_ID "***"
-ENV MASTODON_CLIENT_SECRET "***"
-ENV MASTODON_LOGIN "***"
-ENV MASTODON_PASSWORD "***"
+ENV PROM_PORT 8080
+ENV REDIS_HOST "redis.gcp.wescale"
+ENV SUB_AGGREGA "aggregator-queue-sub"
 
 WORKDIR /app
-COPY --from=build-stage /go/bin/mastodon /app/
+COPY --from=build-stage /go/bin/aggregator-listener /app/
 HEALTHCHECK --interval=5s --retries=3 --timeout=5s CMD curl -f http://localhost:8080/healthz || exit 1
-ENTRYPOINT ./mastodon
+ENTRYPOINT ./aggregator-listener
 EXPOSE 8080

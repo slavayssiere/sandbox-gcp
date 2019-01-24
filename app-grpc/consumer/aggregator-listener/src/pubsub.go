@@ -6,7 +6,10 @@ import (
 	"encoding/json"
 
 	"log"
+	"strconv"
+	"time"
 
+	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -27,15 +30,10 @@ func (s server) connexionSubcriber(address string, filename string, scope ...str
 	return pubsub.NewSubscriberClient(conn)
 }
 
-// MessageAggregator a message send by cloud sheduler
-type MessageAggregator struct {
-	Script string `json:"run"`
-}
-
-func (s server) consumeAggregatorMsg() {
+func (s server) consumeMessageSocial() {
 
 	var pull pubsub.PullRequest
-	pull.Subscription = *aggregasub
+	pull.Subscription = *subname
 	pull.MaxMessages = 5
 	ctx := context.Background()
 
@@ -51,34 +49,40 @@ func (s server) consumeAggregatorMsg() {
 		if err != nil {
 			log.Println(err)
 		} else {
-			s.messageAggregatorreceive(ctx, resp, pull)
+			s.messageSocialreceive(ctx, resp, pull)
 		}
 	}
 }
 
-func (s server) messageAggregatorreceive(ctx context.Context, resp *pubsub.PullResponse, pull pubsub.PullRequest) {
+func (s server) messageSocialreceive(ctx context.Context, resp *pubsub.PullResponse, pull pubsub.PullRequest) {
 	var ackMess pubsub.AcknowledgeRequest
 	ackMess.Subscription = pull.Subscription
 	for _, messRec := range resp.ReceivedMessages {
 		ackMess.AckIds = append(ackMess.AckIds, messRec.GetAckId())
-		s.mAreceive(messRec.GetMessage())
+		s.mSreceive(messRec.GetMessage())
 	}
 	s.sub.Acknowledge(ctx, &ackMess)
 }
 
-func (s server) mAreceive(msg *pubsub.PubsubMessage) {
-	var ma MessageAggregator
-	err := json.Unmarshal(msg.Data, &ma)
+func (s server) mSreceive(msg *pubsub.PubsubMessage) {
+	normtime, errn := strconv.ParseInt(msg.Attributes["normalizer_time"], 10, 64)
+	if errn == nil {
+		var elapsedTime float64
+		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - normtime)
+		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
+	}
+
+	injectime, erri := strconv.ParseInt(msg.Attributes["normalizer_time"], 10, 64)
+	if erri == nil {
+		var elapsedTime float64
+		elapsedTime = float64(time.Now().Round(time.Millisecond).UnixNano() - injectime)
+		s.timeProm.WithLabelValues(*subname).Observe(elapsedTime)
+	}
+	var ms libmetier.MessageSocial
+	err := json.Unmarshal(msg.Data, &ms)
 	if err != nil {
 		log.Println(err)
 	} else {
-		if ma.Script == "dataset" {
-			log.Println("dataset generator")
-		} else {
-			log.Println("aggrega generator")
-			agg := s.computeAggregas()
-			s.writeAggrega("aggregas", agg)
-			go s.top10gen()
-		}
+		s.messages <- (func() (libmetier.MessageSocial, int64, int64) { return ms, normtime, injectime })
 	}
 }

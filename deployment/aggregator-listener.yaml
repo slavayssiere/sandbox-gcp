@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: aggregator-deploy
+  name: aggregator-listener-deploy
   namespace: consumers
   labels:
-    app: aggregator-deploy
+    app: aggregator-listener-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: aggregator-deploy
+      app: aggregator-listener-deploy
   template:
     metadata:
       labels:
-        app: aggregator-deploy
+        app: aggregator-listener-deploy
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/path: '/metrics'
@@ -22,19 +22,15 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.22
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator-listener:0.0.1
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"
-        - name: SUB_AGGREGA 
-          value: "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-datastore.json"
         - name: REDIS_HOST
           value: redis.gcp.wescale
-        - name: PATH_PREFIX
-          value: "/aggregator"
         ports:
         - containerPort: 8080
           name: http
@@ -58,7 +54,7 @@ spec:
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: aggregator-hpa
+  name: aggregator-listener-hpa
   namespace: consumers
 spec:
   minReplicas: 2
@@ -75,57 +71,3 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: aggregator-deploy
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: aggregator-ing
-  namespace: consumers
-  annotations:
-    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
-  labels:
-    traffic-type: external
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /aggregator
-        backend:
-          serviceName: aggregator-svc
-          servicePort: 8080
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: aggregator-svc
-  namespace: consumers
-  labels:
-    k8s-app: aggregator-svc
-spec:
-  selector:
-    app: aggregator-deploy
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-      name: http
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: aggregator-virtualservice
-  namespace: consumers
-spec:
-  hosts:
-  - "istio.gcp-wescale.slavayssiere.fr"
-  gateways:
-  - consumers-gateway
-  http:
-  - match:
-    - uri:
-        prefix: "/aggregator"
-    route:
-    - destination:
-        host: aggregator-svc
-
-

@@ -16,15 +16,11 @@ RUN go install
 FROM alpine
 RUN apk add --no-cache curl ca-certificates
 VOLUME /secret
+
 ENV PROM_PORT 8080
-ENV TOPIC_NAME "projects/slavayssiere-sandbox/topics/mastodon-raw"
+ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/test-sub"
+ENV TOPIC_NAME "projects/slavayssiere-sandbox/topics/test-topic-2"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
-ENV HASHTAG "#GiletsJaunes"
-ENV MASTODON_SERVER "https://linuxrocks.online"
-ENV MASTODON_CLIENT_ID "***"
-ENV MASTODON_CLIENT_SECRET "***"
-ENV MASTODON_LOGIN "***"
-ENV MASTODON_PASSWORD "***"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/mastodon /app/

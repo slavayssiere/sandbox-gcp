@@ -1,116 +1,104 @@
 package main
 
 import (
-	"crypto/x509"
 	"flag"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
 	mastodon "github.com/mattn/go-mastodon"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/oauth"
 
 	"context"
 )
 
 var (
-	addr = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
+	addr      = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
+	mserv     = flag.String("mastodon-server", os.Getenv("MASTODON_SERVER"), "Matodon auth.")
+	mcid      = flag.String("mastodon-client-id", os.Getenv("MASTODON_CLIENT_ID"), "Matodon auth.")
+	mcsct     = flag.String("mastodon-client-sct", os.Getenv("MASTODON_CLIENT_SECRET"), "Matodon auth.")
+	mlog      = flag.String("mastodon-login", os.Getenv("MASTODON_LOGIN"), "Matodon auth.")
+	mpasswd   = flag.String("mastodon-passwd", os.Getenv("MASTODON_PASSWORD"), "Matodon auth.")
+	hashtag   = flag.String("hashtag", os.Getenv("HASHTAG"), "Twitter hashtag")
+	topicname = flag.String("topic", os.Getenv("TOPIC"), "Twitter hashtag")
 )
 
-func connexionPublisher(address string, filename string, scope ...string) pubsub.PublisherClient {
-	pool, _ := x509.SystemCertPool()
-	// error handling omitted
-	creds := credentials.NewClientTLSFromCert(pool, "")
-	log.Printf("Secret in %s\n", filename)
-	perRPC, _ := oauth.NewServiceAccountFromFile(filename, "https://www.googleapis.com/auth/pubsub")
-	conn, _ := grpc.Dial(
-		"pubsub.googleapis.com:443",
-		grpc.WithTransportCredentials(creds),
-		grpc.WithPerRPCCredentials(perRPC),
-	)
-
-	return pubsub.NewPublisherClient(conn)
-}
-
-func publishmessage(maStatus *mastodon.Status, client pubsub.PublisherClient, publishTime chan int64) {
-	var message pubsub.PubsubMessage
-	var request pubsub.PublishRequest
-
-	start := time.Now()
-	ctx := context.Background()
-
-	message.Data = []byte(maStatus.Content)
-	message.Attributes = make(map[string]string)
-	message.Attributes["source"] = "mastodon"
-	message.Attributes["time"] = strconv.FormatInt(start.UnixNano(), 10)
-
-	request.Topic = os.Getenv("TOPIC_NAME")
-	request.Messages = append(request.Messages, &message)
-
-	if _, err := client.Publish(ctx, &request); err != nil {
-		log.Println(err)
-	}
-
-	t := time.Now()
-	elapsed := t.Sub(start)
-
-	publishTime <- elapsed.Nanoseconds()
+type server struct {
+	ps              pubsub.PublisherClient
+	publishTimeChan chan int64
+	timeInjectors   *prometheus.HistogramVec
+	countInjectors  *prometheus.CounterVec
+	streamError     chan bool
+	mastodon        *mastodon.Client
+	timeline        chan mastodon.Event
+	ctx             context.Context
 }
 
 func main() {
 
 	flag.Parse()
+	var s server
+	s.ctx = context.Background()
 
 	// Client
-	clientPub := connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
-	clientMastodon := mastodon.NewClient(&mastodon.Config{
-		Server:       os.Getenv("SERVER"),
-		ClientID:     os.Getenv("CLIENT_ID"),
-		ClientSecret: os.Getenv("CLIENT_SECRET"),
-	})
+	s.ps = s.connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
+	s.publishTimeChan = make(chan int64)
+	s.streamError = make(chan bool)
 
-	err := clientMastodon.Authenticate(context.Background(), os.Getenv("LOGIN"), os.Getenv("PASSWORD"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// mastondon
+	s.mastodon = newMastodon(s.ctx)
 
 	// Prometheus
-	histogramMean := PromHistogramVec()
-	// messagesCounter := PromCounterVec()
-	publishTime := make(chan int64)
+	s.timeInjectors = PromHistogramVec()
+	s.countInjectors = PromCounterVec()
 	go func() {
 		for {
-			elapsed := <-publishTime
-			histogramMean.WithLabelValues(os.Getenv("MESSAGE_SIZE"), os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
+			elapsed := <-s.publishTimeChan
+			s.timeInjectors.WithLabelValues(os.Getenv("TOPIC_NAME")).Observe(float64(elapsed))
 		}
 	}()
 
-	timeline, err := clientMastodon.StreamingHashtag(context.Background(), os.Getenv("HASHTAG"), false)
+	log.Println("Create filter")
+	var err error
+	s.timeline, err = s.mastodon.StreamingHashtag(s.ctx, *hashtag, false)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("tesssssssssssssssst")
+		log.Println(err)
 	}
 
 	go func() {
-		for e := range timeline {
+		for {
+			e := <-s.timeline
 			if _, ok := e.(*mastodon.ErrorEvent); !ok {
-				publishmessage(e.(*mastodon.UpdateEvent).Status, clientPub, publishTime)
+				s.publishmessage(e)
+			} else {
+				log.Println(e)
+				s.streamError <- true
 			}
 		}
 	}()
 
+	// Receive messages until stopped or stream quits
+	go s.reconnectStream(s.ctx)
+
+	var gracefulStop = make(chan os.Signal)
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+	go func() {
+		sig := <-gracefulStop
+		log.Printf("caught sig: %+v", sig)
+		log.Println("Stopping Stream...")
+		log.Println("Wait for 1 second to finish processing")
+		time.Sleep(1 * time.Second)
+		os.Exit(0)
+	}()
+
+	log.Println("launch server...")
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
-
-	// Wait for SIGINT and SIGTERM (HIT CTRL-C)
-	ch := make(chan os.Signal)
-	signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-	log.Println(<-ch)
 }

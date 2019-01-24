@@ -160,3 +160,42 @@ spec:
     route:
     - destination:
         host: www.googleapis.com
+---
+## we have to allow:
+## 
+##    - linuxrocks.online
+##
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: mastodon-egress
+  namespace: injectors
+spec:
+  hosts:
+  - linuxrocks.online
+  location: MESH_EXTERNAL
+  ports:
+  - number: 443
+    name: https
+    protocol: HTTPS
+  - number: 80
+    name: http
+    protocol: HTTP
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: mastodon-egress-vs
+  namespace: injectors
+spec:
+  hosts:
+  - linuxrocks.online
+  tls:
+  - match:
+    - port: 443
+      sni_hosts:
+      - linuxrocks.online
+    route:
+    - destination:
+        host: linuxrocks.online
+---

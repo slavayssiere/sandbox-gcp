@@ -8,8 +8,7 @@ import (
 	"os"
 	"time"
 	"strings"
-
-	"cloud.google.com/go/datastore"
+	
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/genproto/googleapis/pubsub/v1beta2"
@@ -56,7 +55,7 @@ var (
 
 type server struct {
 	sub pubsub.SubscriberClient
-	ds *datastore.Client
+	messages chan func () (libmetier.MessageSocial, int64, int64)
 	timeProm *prometheus.HistogramVec
 	redis *redis.Client
 	ctx context.Context
@@ -72,12 +71,15 @@ func main() {
 
 	log.Println("Get secret from: " + *secretpath)
 	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
-	s.ds = datastoreClient(s.ctx)
+	s.messages = make(chan func () (libmetier.MessageSocial, int64, int64))
 	s.timeProm = promHistogramVec()
 	s.redis = redisNew()
 
 	log.Println("launch consume thread")
-	go s.consumeAggregatorMsg()
+	go s.consumeMessageSocial()
+	
+	log.Println("write in redis")
+	go s.writeMessagesToRedis()
 
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -97,41 +99,6 @@ func main() {
 		Name("health").
 		Handler(handlerHealth)
 	
-	var handlerUsers http.Handler
-	handlerUsers = LoggerMiddleware(s.handlerUsersFunc, "users_get")
-	router.
-		Methods("GET").
-		Path(*pathprefix + "/users").
-		Name("users_get").
-		Handler(handlerUsers)
-
-
-	var handlerTopTen http.Handler
-	handlerTopTen = LoggerMiddleware(s.handlerTopTenFunc, "top_ten")
-	router.
-		Methods("GET").
-		Path(*pathprefix + "/top10").
-		Name("top_ten").
-		Handler(handlerTopTen)
-
-
-	var handlerStats http.Handler
-	handlerStats = LoggerMiddleware(s.handlerStatsFunc, "stats")
-	router.
-		Methods("POST").
-		Path(*pathprefix + "/stats").
-		Name("stats").
-		Handler(handlerStats)
-
-	
-	var handlerStatsID http.Handler
-	handlerStatsID = LoggerMiddleware(s.handlerStatsIDFunc, "stats_id")
-	router.
-		Methods("GET").
-		Path(*pathprefix + "/stats/{id}").
-		Name("stats_id").
-		Handler(handlerStatsID)
-
 	router.Methods("GET").Path("/metrics").Name("Metrics").Handler(promhttp.Handler())
 
 	// CORS

@@ -31,11 +31,6 @@ func redisNew() *redis.Client {
 	return client
 }
 
-func (s server) countUser(tag string, user string) {
-	s.redis.Incr(user + "_" + tag)
-	s.redis.SAdd("list_users_"+tag, user)
-}
-
 // UserCounter UserCounter
 type UserCounter struct {
 	Users []libmetier.AggregatedData `json:"users"`
@@ -79,18 +74,6 @@ func (s server) getUsersCounterList(limit int) []UserCounter {
 		listUsers = append(listUsers, uc)
 	}
 	return listUsers
-}
-
-func (s server) addNormTime(tag string, normtime int64) {
-	s.redis.LPush("normTimes_"+tag+"_"+string(s.getNbAggregation()), normtime)
-}
-
-func (s server) addInjectTime(tag string, injectime int64) {
-	s.redis.LPush("injectTimes_"+tag+"_"+string(s.getNbAggregation()), injectime)
-}
-
-func (s server) addAggTime(tag string, aggtime int64) {
-	s.redis.LPush("aggTimes_"+tag+"_"+string(s.getNbAggregation()), aggtime)
 }
 
 func (s server) getMeanTimes(tag string, key string, aggrega int64) (float64, int64) {
@@ -145,21 +128,4 @@ func (s server) getNbAggregation() int64 {
 		log.Println(err)
 	}
 	return nb
-}
-
-func (s server) addTag(tag string) {
-	s.redis.SAdd("tag_list", tag)
-}
-
-func (s server) writeMessagesToRedis() {
-
-	for {
-		mess, normtime, injectime := (<-s.messages)()
-		s.addTag(mess.Tag)
-		if len(mess.User) > 0 {
-			s.countUser(mess.Tag, mess.User)
-		}
-		s.addNormTime(mess.Tag, time.Now().UnixNano()-normtime)
-		s.addInjectTime(mess.Tag, time.Now().UnixNano()-injectime)
-	}
 }
