@@ -14,6 +14,7 @@ type MessageSocial struct {
 	Tag       string    `json:"tag"`
 	Date      time.Time `json:"timestamp"`
 	Sentiment float32   `json:"sentiment"`
+	ID        string    `json:"id"`
 }
 
 // ToMessageSocial public function
