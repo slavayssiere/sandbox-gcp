@@ -20,7 +20,7 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "istio.gcp-wescale.slavayssiere.fr"
+    - "public.gcp-wescale.slavayssiere.fr"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry

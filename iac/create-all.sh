@@ -6,6 +6,10 @@ cd layer-base
 ./apply.sh
 cd -
 
+cd layer-bastion
+./apply.sh
+cd -
+
 cd layer-kubernetes
 ./apply.sh
 cd -
@@ -15,5 +19,9 @@ cd layer-data
 cd -
 
 cd layer-services
+./apply.sh
+cd -
+
+cd ../visualizer
 ./apply.sh
 cd -

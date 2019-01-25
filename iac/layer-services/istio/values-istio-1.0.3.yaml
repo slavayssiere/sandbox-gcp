@@ -240,7 +240,7 @@ gateways:
       targetAverageUtilization: 80
     loadBalancerIP: ""
     serviceAnnotations:
-      external-dns.alpha.kubernetes.io/hostname: istio.gcp-wescale.slavayssiere.fr
+      external-dns.alpha.kubernetes.io/hostname: public.gcp-wescale.slavayssiere.fr
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     externalTrafficPolicy: Local

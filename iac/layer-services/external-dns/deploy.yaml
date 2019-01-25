@@ -21,6 +21,9 @@ rules:
 - apiGroups: [""]
   resources: ["nodes"]
   verbs: ["list"]
+- apiGroups: ["networking.istio.io"]
+  resources: ["gateways"]
+  verbs: ["get","watch","list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -56,6 +59,7 @@ spec:
         args:
         - --source=service
         - --source=ingress
+        - --source=istio-gateway
         - --domain-filter=gcp-wescale.slavayssiere.fr # will make ExternalDNS see only the hosted zones matching provided domain, omit to process all available hosted zones
         - --provider=google
 #        - --google-project=zalando-external-dns-test # Use this to specify a project different from the one external-dns is running inside
@@ -84,6 +88,8 @@ spec:
         args:
         - --source=service
         - --source=ingress
+        - --source=istio-gateway
+        - --istio-ingress-gateway=istio-system/admin-ingressgateway
         - --domain-filter=gcp.wescale # will make ExternalDNS see only the hosted zones matching provided domain, omit to process all available hosted zones
         - --provider=google
 #        - --google-project=zalando-external-dns-test # Use this to specify a project different from the one external-dns is running inside

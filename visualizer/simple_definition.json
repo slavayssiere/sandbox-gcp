@@ -8,39 +8,31 @@
         "columnFamilies" : [
             {
                 "familyId": "ms",
-                "type": "STRING",
-                "encoding": "BINARY",
                 "onlyReadLatest": "true",
                 "columns": [
                     {
-                        "fieldName": "data",
                         "qualifierString": "data",
-                        "qualifierEncoded":"data"
+                        "type": "STRING"
                     },
                     {
-                        "fieldName": "user",
                         "qualifierString": "user",
-                        "qualifierEncoded":"user"
+                        "type": "STRING"
                     },
                     {
-                        "fieldName": "source",
                         "qualifierString": "source",
-                        "qualifierEncoded":"src"
+                        "type": "STRING"
                     },
                     {
-                        "fieldName": "time",
                         "qualifierString": "time",
-                        "qualifierEncoded":"time"
+                        "type": "STRING"
                     },
                     {
-                        "fieldName": "tag",
                         "qualifierString": "tag",
-                        "qualifierEncoded":"tag"
+                        "type": "STRING"
                     },
                     {
-                        "fieldName": "sentiment",
                         "qualifierString": "sentiment",
-                        "qualifierEncoded":"sentiment"
+                        "type": "STRING"
                     }
                 ]
             }

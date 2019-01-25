@@ -5,6 +5,11 @@ echo "Destroy dataset..."
 ./destroy.sh
 cd -
 
+cd layer-bastion
+terraform destroy \
+    -auto-approve
+cd -
+
 cd layer-data
 ./destroy.sh
 cd -

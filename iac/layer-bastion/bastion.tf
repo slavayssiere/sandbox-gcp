@@ -10,20 +10,29 @@ resource "google_compute_firewall" "training_fw_rules" {
   target_tags = ["bastion"]
 }
 
-data "google_dns_managed_zone" "public-gcp-wescale" {
-  name = "gcp-wescale"
+resource "google_compute_firewall" "bastion_to_cluster_fw_rules" {
+  name    = "bastion-to-cluster-training-fw-rules"
+  network = "demo-net"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "8080", "443"]
+  }
+
+  source_tags = ["bastion"]
+  target_tags = ["test-cluster"]
 }
 
-data "google_dns_managed_zone" "private-gcp-wescale" {
-  name = "private-dns-zone"
+data "google_dns_managed_zone" "public-gcp-wescale" {
+  name = "slavayssiere-soa"
 }
 
 resource "google_dns_record_set" "bastion" {
-  name = "bastion.${data.google_dns_managed_zone.gcp-wescale.dns_name}"
+  name = "bastion.${data.google_dns_managed_zone.public-gcp-wescale.dns_name}"
   type = "A"
   ttl  = 300
 
-  managed_zone = "${data.google_dns_managed_zone.gcp-wescale.name}"
+  managed_zone = "${data.google_dns_managed_zone.public-gcp-wescale.name}"
 
   rrdatas = ["${google_compute_instance.bastion-europe-1b.network_interface.0.access_config.0.nat_ip}"]
 }
@@ -59,7 +68,6 @@ resource "google_compute_instance" "bastion-europe-1b" {
   metadata_startup_script = "${file("${path.cwd}/install-vm.sh")}"
 
   service_account {
-    email  = "sa-bastion@slavayssiere-sandbox.iam.gserviceaccount.com"
     scopes = ["cloud-platform", "compute-rw", "storage-rw"]
   }
 }

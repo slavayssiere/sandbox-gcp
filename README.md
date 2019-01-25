@@ -46,16 +46,15 @@ Aller sur le [site: "http://public.gcp-wescale.slavayssiere.fr"](http://public.g
 #### Génération d'aggregas
 
 ```language-bash
-curl -X POST http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
+curl -X POST http://public.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
 ```
 
 ```language-bash
-curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
+curl -X GET http://public.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
 ```
 
-
 ```language-bash
-curl -X GET http://istio.gcp-wescale.slavayssiere.fr/aggregator/top10 | jq .
+curl -X GET http://public.gcp-wescale.slavayssiere.fr/aggregator/top10 | jq .
 ```
 
 #### To test datavisualisation
@@ -64,3 +63,12 @@ Aller sur Google Drive
 
 kubectl create ns test
 kubectl -n test run -i --tty busybox --image=busybox --restart=Never -- sh
+
+## Observability
+
+sudo ssh -i /Users/slavayssiere/.ssh/id_rsa admin@bastion.gcp-wescale.slavayssiere.fr -L 80:admin.gcp.wescale:80
+
+http://servicegraph.localhost/force/forcegraph.html
+http://jaeger.localhost
+http://prometheus.localhost
+http://grafana.localhost

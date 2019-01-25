@@ -35,11 +35,12 @@ helm install --name prometheuses stable/prometheus-operator --namespace monitori
 # kubectl apply -f stackdriver-tracing.yaml
 # rm stackdriver-tracing.yaml
 
-apply_kubectl "traefik-consul"
-apply_kubectl "traefik-app"
-apply_kubectl "traefik-admin"
+############################ replace by istio ############################
+# apply_kubectl "traefik-consul"
+# apply_kubectl "traefik-app" 
+# apply_kubectl "traefik-admin"
+############################ /replace by istio ############################
 apply_kubectl "external-dns"
-apply_kubectl "monitoring"
 
 # if [ ! -d "istio-1.0.3" ]; then
 #     wget https://github.com/istio/istio/releases/download/1.0.3/istio-1.0.3-osx.tar.gz
@@ -60,6 +61,8 @@ fi
 cd istio-1.0.5
     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio-1.0.5.yaml
 cd -
+
+apply_kubectl "monitoring"
 
 ## delete istio CRD
 # kubectl delete customresourcedefinitions $(kubectl get customresourcedefinitions | cut -d ' ' -f1 | grep istio.io)

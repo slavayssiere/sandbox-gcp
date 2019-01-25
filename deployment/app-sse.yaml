@@ -111,7 +111,7 @@ metadata:
   namespace: consumers
 spec:
   hosts:
-  - "istio.gcp-wescale.slavayssiere.fr"
+  - "public.gcp-wescale.slavayssiere.fr"
   gateways:
   - consumers-gateway
   http:
