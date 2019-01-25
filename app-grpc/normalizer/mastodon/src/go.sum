@@ -49,6 +49,8 @@ github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190117151940-da0
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190117151940-da0da66ff6fe/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38 h1:eBSQRlZwNSh/2QxNuQSdmQQBVNuF8ep9O4wMuEbN7lQ=
 github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190125133341-f6c0f9dfe986 h1:ETs+t78PCDwOXo5b4Dz/z0h91n43kq05BjTN1NnMf/M=
+github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190125133341-f6c0f9dfe986/go.mod h1:27nBiy8enX0lkPkoxRaaa6EOh9JhjTq0a3aCwATpg4I=
 github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80 h1:nrZ3ySNYwJbSpD6ce9duiP+QkD3JuLCcWkdaehUS/3Y=
 github.com/tomnomnom/linkheader v0.0.0-20180905144013-02ca5825eb80/go.mod h1:iFyPdL66DjUD96XmzVL3ZntbzcflLnznH0fr99w5VqE=
 go.opencensus.io v0.18.0 h1:Mk5rgZcggtbvtAun5aJzAtjKKN/t0R3jJPlWILlv938=

@@ -9,7 +9,7 @@ require (
 	github.com/prometheus/client_model v0.0.0-20190109181635-f287a105a20e
 	github.com/prometheus/common v0.0.0-20190107103113-2998b132700a
 	github.com/prometheus/procfs v0.0.0-20190104112138-b1a0a9a36d74
-	github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190123151757-fd351bf47b38
+	github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier v0.0.0-20190125133341-f6c0f9dfe986
 	golang.org/x/net v0.0.0-20190108225652-1e06a53dbb7e
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890
 	golang.org/x/sys v0.0.0-20190109145017-48ac38b7c8cb

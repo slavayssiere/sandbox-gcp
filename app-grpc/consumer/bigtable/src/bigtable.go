@@ -25,6 +25,7 @@ const (
 	columnTagSource  = "tag"
 	columnNameDate   = "time"
 	columnSentiment  = "sentiment"
+	columnID         = "ID"
 )
 
 // sliceContains reports whether the provided string is present in the given slice of strings.
@@ -59,6 +60,7 @@ func (s server) writeMessage(ctx context.Context, mess libmetier.MessageSocial) 
 	mut.Set(columnFamilyName, columnNameUser, bigtable.Now(), []byte(mess.User))
 	mut.Set(columnFamilyName, columnNameSource, bigtable.Now(), []byte(mess.Source))
 	mut.Set(columnFamilyName, columnTagSource, bigtable.Now(), []byte(mess.Tag))
+	mut.Set(columnFamilyName, columnID, bigtable.Now(), []byte(mess.ID))
 	mut.Set(columnFamilyName, columnNameDate, bigtable.Now(),[]byte(mess.Date.Format(time.RFC3339Nano)))
 	mut.Set(columnFamilyName, columnSentiment, bigtable.Now(),[]byte(fmt.Sprintf("%f", mess.Sentiment)))
 

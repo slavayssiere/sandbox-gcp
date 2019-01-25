@@ -1,20 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>HTML5 Server Side Event Example in Go</title>
+    <!-- Required meta tags -->
+    <!-- <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	 -->
+    <title>App SSE - MessageSocial</title>
 </head>
 <body>
 
-	Yo ! Stream messages of your social networks (Topic {{.}}):<br>
+	Liste des messages de (Topic {{.}}):<br>
 
 	<script type="text/javascript">
 	    // Create a new HTML5 EventSource
 	    var source = new EventSource('/events/');
 	    // Create a callback for when a new message is received.
 	    source.onmessage = function(e) {
-	        // Append the `data` attribute of the message to the DOM.
-	        document.body.innerHTML += e.data + '<br>';
-	    };
+            // Append the `data` attribute of the message to the DOM.
+            console.log(e);
+	        // document.body.innerHTML += '<div class="alert alert-primary" role="alert">' 
+            //     + e + '</br>'
+            //     + '</div>';
+        };
+        
+        source.onopen = function(e) {
+            console.log(e);
+        }
+
+        source.onerror = function(e){
+            console.log(e);
+        }
 	</script>
 </body>
 </html>

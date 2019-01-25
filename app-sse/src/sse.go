@@ -46,7 +46,9 @@ func (b *Broker) start() {
 // This Broker method handles and HTTP request at the "/events/" URL.
 //
 func (b *Broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+	// w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 	// Make sure that the writer supports flushing.
 	//
 	f, ok := w.(http.Flusher)
@@ -88,11 +90,13 @@ func (b *Broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Write to the ResponseWriter, `w`.
-		fmt.Fprintf(w, "data: Message: %s\n\n", msg)
+		fmt.Fprintf(w, "%s\n", msg)
 
 		// Flush the response.  This is only possible if
 		// the repsonse supports streaming.
 		f.Flush()
+
+		log.Println(msg)
 	}
 
 	// Done.

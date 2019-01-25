@@ -33,6 +33,10 @@
                     {
                         "qualifierString": "sentiment",
                         "type": "STRING"
+                    },
+                    {
+                        "qualifierString": "ID",
+                        "type": "STRING"
                     }
                 ]
             }

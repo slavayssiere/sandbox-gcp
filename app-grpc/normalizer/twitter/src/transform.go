@@ -54,6 +54,7 @@ func (s server) convert() {
 		u.Source = "twitter"
 		u.Tag = tag
 		u.Date = time.Unix(0, starttime)
+		u.ID = tweet.IDStr
 		t := time.Now()
 		u.Sentiment = s.analyzeText(tweet.Text)
 		log.Println(time.Now().Sub(t).Seconds())
