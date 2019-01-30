@@ -39,6 +39,11 @@ resource "google_container_cluster" "test-cluster" {
       cidr_block   = "82.254.196.12/32"
       display_name = "assos_1"
     }
+
+    cidr_blocks {
+      cidr_block = "81.31.9.164/32"
+      display_name = "other"
+    }
     
   }
 

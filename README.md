@@ -23,6 +23,13 @@ export CONSUMER_KEY="***"
 export CONSUMER_SECRET="***"
 export ACCESS_TOKEN="***"
 export ACCESS_SECRET="***"
+
+
+export MASTODON_SERVER="https://linuxrocks.online"
+export MASTODON_CLIENT_ID="***"
+export MASTODON_CLIENT_SECRET="***"
+export MASTODON_LOGIN="***"
+export MASTODON_PASSWORD="***"
 ```
 
 ## Création de la plateform
@@ -66,9 +73,16 @@ kubectl -n test run -i --tty busybox --image=busybox --restart=Never -- sh
 
 ## Observability
 
-sudo ssh -i /Users/slavayssiere/.ssh/id_rsa admin@bastion.gcp-wescale.slavayssiere.fr -L 80:admin.gcp.wescale:80
+Connect to bastion and create local SSH tunnel:
 
-http://servicegraph.localhost/force/forcegraph.html
-http://jaeger.localhost
-http://prometheus.localhost
-http://grafana.localhost
+```language-bash
+sudo ssh -i /Users/slavayssiere/.ssh/id_rsa admin@bastion.gcp-wescale.slavayssiere.fr -L 80:admin.gcp.wescale:80
+```
+
+To view Istio observability stack, please follow: 
+
+- [Service Graph](http://servicegraph.localhost/force/forcegraph.html)
+- [Jaeger](http://jaeger.localhost)
+- [Prometheus](http://prometheus.localhost)
+- [Grafana](http://grafana.localhost)
+- [Kiali](http://kiali.localhost)

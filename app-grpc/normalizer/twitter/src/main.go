@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strconv"
 	"flag"
 	"log"
 	"math/rand"
@@ -25,6 +26,7 @@ var (
 	addr    = flag.String("listen-address", ":"+os.Getenv("PROM_PORT"), "The address to listen on for HTTP requests.")
 	topic   = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "The topic listen.")
 	subname = flag.String("sub-name", os.Getenv("SUB_NAME"), "the subscription write")
+	els     = flag.String("enable-language", os.Getenv("LANGUAGE"), "enable the language-sentiment call")
 )
 
 type server struct {
@@ -35,6 +37,7 @@ type server struct {
 	timeProm    *prometheus.HistogramVec
 	language    *language.Client
 	ctx         context.Context
+	el bool
 }
 
 func main() {
@@ -42,6 +45,13 @@ func main() {
 	flag.Parse()
 
 	var s server
+	var err error
+
+	s.el, err = strconv.ParseBool(*els)
+	if err != nil {
+		log.Println(err)
+		s.el = false
+	}
 
 	s.ctx = context.Background()
 

@@ -21,6 +21,7 @@ ENV PROM_PORT 8080
 ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/test-sub"
 ENV TOPIC_NAME "projects/slavayssiere-sandbox/topics/test-topic-2"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
+ENV LANGUAGE "false"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/twitter /app/

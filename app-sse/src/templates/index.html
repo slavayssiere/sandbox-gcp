@@ -2,35 +2,110 @@
 <html>
 <head>
     <!-- Required meta tags -->
-    <!-- <meta charset="utf-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-	 -->
     <title>App SSE - MessageSocial</title>
 </head>
+<style>
+h1 {
+    background-color: #09aa9d;
+    padding-bottom: 10px;
+    border-top-width: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+}
+#fleet-1 {
+    padding-bottom: 10px;
+    border-top-width: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+}
+
+#fleet-2 {
+    padding-bottom: 10px;
+    border-top-width: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+}
+
+
+#fleet-3 {
+    padding-bottom: 10px;
+    border-top-width: 10px;
+    padding-top: 10px;
+    padding-left: 20px;
+}
+</style>
 <body>
+    <h1><img src="https://www.wescale.fr/images/logo.png" style="padding-right: 20px;">Live Messages Sociaux</h1>
 
-	Liste des messages de (Topic {{.}}):<br>
+    <div class="row">
+        <div class="col-md-4" id="fleet-1"></div>
+        <div class="col-md-4" id="fleet-2"></div>
+        <div class="col-md-4" id="fleet-3"></div>
+    </div>
 
-	<script type="text/javascript">
-	    // Create a new HTML5 EventSource
-	    var source = new EventSource('/events/');
-	    // Create a callback for when a new message is received.
-	    source.onmessage = function(e) {
-            // Append the `data` attribute of the message to the DOM.
-            console.log(e);
-	        // document.body.innerHTML += '<div class="alert alert-primary" role="alert">' 
-            //     + e + '</br>'
-            //     + '</div>';
-        };
-        
-        source.onopen = function(e) {
-            console.log(e);
+
+    <script type="text/javascript">
+        // Create a new HTML5 EventSource
+        var nb = 1;
+        if (!!window.EventSource) {
+            var source = new EventSource('http://public.gcp-wescale.slavayssiere.fr/events/');
+            // Create a callback for when a new message is received.
+            // source.onmessage = function(e) {
+            //     // Append the `data` attribute of the message to the DOM.
+            //     console.log(e);
+            // };
+            
+            // source.onopen = function(e) {
+            //     console.log(e);
+            // }
+
+            // source.onerror = function(e){
+            //     console.log(e);
+            // }
+
+            // {"data":"...","user":"lagrost anne","source":"twitter","tag":"#GiletsJaunes","timestamp":"2019-01-30T16:17:37.206025277Z","sentiment":0,"id":"1090645193970339843"}
+            source.addEventListener('message', function(e) {
+                var data = JSON.parse(e.data);
+                var src 
+                console.log(data.source);
+                if (data.source === 'twitter') {
+                    src = '<img src="./twitter.png" height="20px" />'
+                } else {
+                    src = data.source
+                }
+                var fleetDiv = document.getElementById('fleet-'+nb);
+                nb = nb + 1;
+                if (nb == 4) {
+                    nb = 1;
+                }
+                var tmp = fleetDiv.innerHTML
+                fleetDiv.innerHTML = '<div class="card text-white bg-primary mb-3">' 
+                    + '<div class="card-header">' + src + ' / ' + data.tag + '</div>'
+                    + '<div class="card-body">'
+                    + '<h5 class="card-title">' + data.user + '</h5>'
+                    + '<p class="card-text">' + data.data + '</p>'
+                    + '</div>'
+                    + '</div>' + tmp;
+            }, false);
+
+            source.addEventListener('open', function(e) {
+                // Connection was opened.
+                console.log("open EventSource ", e)
+            }, false);
+
+            source.addEventListener('error', function(e) {
+                if (e.readyState == EventSource.CLOSED) {
+                    // Connection was closed.
+                    console.log("close EventSource ", e)
+                }
+            }, false);
+        } else {
+            console.log("error on EventSource")
         }
 
-        source.onerror = function(e){
-            console.log(e);
-        }
-	</script>
+    </script>
 </body>
 </html>

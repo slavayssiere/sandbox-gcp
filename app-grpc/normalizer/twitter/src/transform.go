@@ -56,7 +56,11 @@ func (s server) convert() {
 		u.Date = time.Unix(0, starttime)
 		u.ID = tweet.IDStr
 		t := time.Now()
-		u.Sentiment = s.analyzeText(tweet.Text)
+		if s.el == true {
+			u.Sentiment = s.analyzeText(tweet.Text)
+		} else {
+			u.Sentiment = 0.0
+		}
 		log.Println(time.Now().Sub(t).Seconds())
 		s.msgStream <- (func() (libmetier.MessageSocial, int64) { return u, starttime })
 	}
