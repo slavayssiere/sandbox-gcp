@@ -22,3 +22,7 @@ cd -
 cd layer-base
 ./destroy.sh
 cd -
+
+cd ../functions
+./destroy.sh
+cd -

@@ -70,4 +70,4 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: aggregator-deploy
+    name: aggregator-listener-deploy

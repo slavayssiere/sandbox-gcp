@@ -58,6 +58,8 @@ curl -X POST http://public.gcp-wescale.slavayssiere.fr/aggregator/stats | jq .
 
 ```language-bash
 curl -X GET http://public.gcp-wescale.slavayssiere.fr/aggregator/stats/1 | jq .
+curl -X GET https://us-central1-slavayssiere-sandbox.cloudfunctions.net/laststat | jq .
+curl -X GET https://us-central1-slavayssiere-sandbox.cloudfunctions.net/getstat?id=1 | jq .
 ```
 
 ```language-bash

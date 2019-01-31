@@ -192,12 +192,13 @@ global:
 # ingress configuration
 #
 ingress:
-  enabled: false
+  enabled: true
   replicaCount: 1
   autoscaleMin: 1
   autoscaleMax: 5
   service:
-    annotations: {}
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: ingress.gcp-wescale.slavayssiere.fr
     loadBalancerIP: ""
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.

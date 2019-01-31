@@ -25,3 +25,7 @@ cd -
 cd ../visualizer
 ./apply.sh
 cd -
+
+cd ../functions
+./apply.sh
+cd -

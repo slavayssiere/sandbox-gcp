@@ -1,10 +1,11 @@
-package laststat
+package getstat
 
 import (
 	"context"
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"cloud.google.com/go/datastore"
@@ -43,10 +44,27 @@ func init() {
 	}
 }
 
-// LastStat test function
-func LastStat(w http.ResponseWriter, r *http.Request) {
+// GetStat test function
+func GetStat(w http.ResponseWriter, r *http.Request) {
 
-	ret := getLastStatID()
+	start := time.Now()
+	ids := r.URL.Query().Get("id")
+
+	var ret statStatus
+	id, _ := strconv.ParseInt(ids, 10, 64)
+	log.Printf("search stats n:%d", id)
+	ret.Agg = getStatbyID(id)
+	t := time.Now()
+	ret.Elapsed = int64(t.Sub(start))
+	ret.Status = "done"
+
+	//convert to ms
+	agg := ret.Agg
+	agg.InjectorMean = agg.InjectorMean / 1000000
+	agg.NormalizerMean = agg.NormalizerMean / 1000000
+	ret.Agg = agg
+	ret.Elapsed = ret.Elapsed / 1000000
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
@@ -55,12 +73,12 @@ func LastStat(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getLastStatID() Aggrega {
+func getStatbyID(id int64) Aggrega {
 
-	var err error
 	var ret []Aggrega
+	var err error
 
-	q := datastore.NewQuery("aggregas").Order("-create_timestamp").Limit(1)
+	q := datastore.NewQuery("aggregas").Filter("num=", id)
 	_, err = ds.GetAll(ctx, q, &ret)
 	if err != nil {
 		log.Printf("datastore: could not list Aggrega: %v", err)

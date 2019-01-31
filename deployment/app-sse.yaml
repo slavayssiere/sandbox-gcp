@@ -69,24 +69,40 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: app-sse-deploy
----
+# ---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: app-sse-ing
+#   namespace: consumers
+#   annotations:
+#     traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
+#   labels:
+#     traffic-type: external
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /
+#         backend:
+#           serviceName: app-sse-svc
+#           servicePort: 8080
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: app-sse-ing
   namespace: consumers
-  annotations:
-    traefik.ingress.kubernetes.io/rule-type: PathPrefixStrip
-  labels:
-    traffic-type: external
+annotations:
+  kubernetes.io/ingress.class: istio
 spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        backend:
-          serviceName: app-sse-svc
-          servicePort: 8080
+rules:
+- host: public.gcp-wescale.slavayssiere.fr
+  http:
+    paths:
+    - path: /
+      backend:
+        serviceName: app-sse-svc
+        servicePort: 8080
 ---
 apiVersion: v1
 kind: Service

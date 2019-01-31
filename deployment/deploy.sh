@@ -44,9 +44,4 @@ kubectl create secret generic sa-pubsub-datastore \
     --from-file=../iac/sa-pubsub-datastore.json \
     -n consumers
 
-################################ Aggregators ################################
-kubectl create secret generic sa-aggregator \
-    --from-file=../iac/sa-aggregator.json \
-    -n aggregators
-
 kubectl apply -f .

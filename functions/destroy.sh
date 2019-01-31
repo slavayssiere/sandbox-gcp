@@ -1,5 +1,4 @@
 #!/bin/bash
 
-cd laststat
 gcloud -q functions delete laststat
-cd -
+gcloud -q functions delete getstat
