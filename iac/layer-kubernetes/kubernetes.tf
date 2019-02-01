@@ -36,8 +36,8 @@ resource "google_container_cluster" "test-cluster" {
     }
 
     cidr_blocks {
-      cidr_block   = "82.254.196.12/32"
-      display_name = "assos_1"
+      cidr_block   = "${var.myip}/32"
+      display_name = "dyn"
     }
 
     cidr_blocks {
@@ -50,8 +50,8 @@ resource "google_container_cluster" "test-cluster" {
   min_master_version = "1.11.5-gke.5"
   node_version       = "1.11.5-gke.5"
 
-  network    = "demo-net"
-  subnetwork = "demo-subnet"
+  network    = "projects/slavayssiere-sandbox/global/networks/demo-net"
+  subnetwork = "projects/slavayssiere-sandbox/regions/europe-west1/subnetworks/demo-subnet"
 
   addons_config {
     kubernetes_dashboard {
