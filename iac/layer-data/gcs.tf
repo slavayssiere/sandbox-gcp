@@ -1,6 +1,9 @@
-resource "google_storage_bucket" "code-dataflow-bucket" {
-  name     = "code-dataflow-bucket"
-  location = "europe-west1"
-  storage_class = "REGIONAL"
-  force_destroy = true
-}
+// resource "google_storage_bucket" "assets-gcp-wescale" {
+//   name     = "assets.gcp-wescale.slavayssiere.fr"
+//   location = "europe-west1"
+
+//   website {
+//     main_page_suffix = "index.html"
+//     not_found_page   = "404.html"
+//   }
+// }

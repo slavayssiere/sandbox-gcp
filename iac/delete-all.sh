@@ -26,3 +26,5 @@ cd -
 cd ../functions
 ./destroy.sh
 cd -
+
+gsutil rm -r gs://assets.gcp-wescale.slavayssiere.fr

@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/credentials/oauth"
 )
 
-func connexionSubcriber(address string, filename string, scope ...string) pubsub.SubscriberClient {
+func connexionSubcriber(ctx context.Context, subname string, address string, filename string, scope ...string) pubsub.SubscriberClient {
 	pool, err := x509.SystemCertPool()
 	if err != nil {
 		log.Println(err)
@@ -35,40 +35,56 @@ func connexionSubcriber(address string, filename string, scope ...string) pubsub
 		log.Println(err)
 	}
 
-	return pubsub.NewSubscriberClient(conn)
+	client := pubsub.NewSubscriberClient(conn)
+
+	//create specific subscription
+	_, err = client.CreateSubscription(ctx, &pubsub.Subscription{
+		Name:  subname,
+		Topic: *topicName,
+	})
+	if err != nil {
+		log.Println(err)
+	}
+
+	return client
+}
+
+func (s server) closeSubscription() {
+	s.clt.DeleteSubscription(s.ctx, &pubsub.DeleteSubscriptionRequest{
+		Subscription: s.sub,
+	})
 }
 
 func (s server) consumemessage() {
 
 	var pull pubsub.PullRequest
-	pull.Subscription = *subName
+	pull.Subscription = s.sub
 	pull.MaxMessages = 5
 
-	ctx := context.Background()
+	if s.ctx == nil {
+		log.Println("Context is nil")
+	}
+	if s.clt == nil {
+		log.Println("s.sub is nil")
+	}
 
 	for {
-		if ctx == nil {
-			log.Println("Context is nil")
-		}
-		if s.clt == nil {
-			log.Println("s.sub is nil")
-		}
-		if resp, err := s.clt.Pull(ctx, &pull); err != nil {
+		if resp, err := s.clt.Pull(s.ctx, &pull); err != nil {
 			fmt.Println(err)
 		} else {
-			s.messagesreceive(ctx, resp, pull)
+			s.messagesreceive(resp, pull)
 		}
 	}
 }
 
-func (s server) messagesreceive(ctx context.Context, resp *pubsub.PullResponse, pull pubsub.PullRequest) {
+func (s server) messagesreceive(resp *pubsub.PullResponse, pull pubsub.PullRequest) {
 	var ackMess pubsub.AcknowledgeRequest
 	ackMess.Subscription = pull.Subscription
 	for _, messRec := range resp.ReceivedMessages {
 		ackMess.AckIds = append(ackMess.AckIds, messRec.GetAckId())
 		s.msgreceive(messRec.GetMessage())
 	}
-	s.clt.Acknowledge(ctx, &ackMess)
+	s.clt.Acknowledge(s.ctx, &ackMess)
 }
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {

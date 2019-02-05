@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/signal"
@@ -22,12 +25,18 @@ type server struct {
 	timeSSE  *prometheus.HistogramVec
 	messages chan libmetier.MessageSocial
 	b        *Broker
+	sub      string
+	ctx      context.Context
 }
 
 var (
-	subName = flag.String("sub-name", os.Getenv("SUB_NAME"), "the pubsub sunbscription")
-	message pubsub.PubsubMessage
+	topicName = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "the pubsub subscription")
+	message   pubsub.PubsubMessage
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func main() {
 
@@ -35,8 +44,14 @@ func main() {
 
 	var s server
 
+	s.ctx = context.Background()
+
+	sha256 := sha256.Sum256([]byte(time.Now().Format(time.RFC1123)))
+
+	s.sub = fmt.Sprintf("projects/slavayssiere-sandbox/subscriptions/app-sse-subcription-%x", sha256)
+
 	// Sub client
-	s.clt = connexionSubcriber("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
+	s.clt = connexionSubcriber(s.ctx, s.sub, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 
 	s.timeSSE = promHistogramVec()
 
@@ -82,6 +97,7 @@ func main() {
 	go func() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v", sig)
+		s.closeSubscription()
 		fmt.Println("Wait for 1 second to finish processing")
 		time.Sleep(1 * time.Second)
 		os.Exit(0)

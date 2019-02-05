@@ -44,4 +44,8 @@ kubectl create secret generic sa-pubsub-datastore \
     --from-file=../iac/sa-pubsub-datastore.json \
     -n consumers
 
+kubectl create secret generic sa-sse \
+    --from-file=../iac/sa-sse.json \
+    -n consumers
+
 kubectl apply -f .
