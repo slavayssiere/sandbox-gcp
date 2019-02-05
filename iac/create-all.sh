@@ -30,9 +30,14 @@ cd ../functions
 ./apply.sh
 cd -
 
-gsutil mb gs://assets.gcp-wescale.slavayssiere.fr
+ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
 
-gsutil cp ../app-sse/src/templates/index.html gs://assets.gcp-wescale.slavayssiere.fr
-gsutil cp ../app-sse/src/templates/twitter.png gs://assets.gcp-wescale.slavayssiere.fr
-gsutil iam ch allUsers:objectViewer gs://assets.gcp-wescale.slavayssiere.fr
-gsutil web set -m index.html -e 404.html gs://assets.gcp-wescale.slavayssiere.fr
+gsutil mb gs://$ASSET_DOMAIN
+
+gsutil cp ../app-sse/src/templates/index.html gs://$ASSET_DOMAIN
+gsutil cp ../app-sse/src/templates/twitter.png gs://$ASSET_DOMAIN
+gsutil iam ch allUsers:objectViewer gs://$ASSET_DOMAIN
+gsutil web set -m index.html -e 404.html gs://$ASSET_DOMAIN
+
+gcloud beta compute ssl-certificates create "gcp-wescale-asset-cert" --domains $ASSET_DOMAIN
+

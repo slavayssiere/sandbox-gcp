@@ -242,6 +242,7 @@ gateways:
     loadBalancerIP: ""
     serviceAnnotations: 
       external-dns.alpha.kubernetes.io/hostname: public.gcp-wescale.slavayssiere.fr
+      beta.cloud.google.com/backend-config: '{"default": "config-default"}'
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     externalTrafficPolicy: Local

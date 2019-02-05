@@ -7,6 +7,9 @@ export GCP_PROJECT=$(gcloud config get-value project)
 docker build -t eu.gcr.io/$GCP_PROJECT/app-sse:$version .
 docker push eu.gcr.io/$GCP_PROJECT/app-sse:$version
 
+git tag -a $version -m "new version: $version"
+git push origin $version
+
 # docker run -d \
 #     -v $SECRET_PATH:/secret/secret-sa-gcp-pubsub.json \
 #     -e SUB_NAME=$TOPIC_NAME \

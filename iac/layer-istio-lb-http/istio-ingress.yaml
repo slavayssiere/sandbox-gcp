@@ -1,0 +1,13 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: demo-ingress
+  namespace: istio-system
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "istio-lb-http"
+    ingress.gcp.kubernetes.io/pre-shared-cert: "gcp-wescale-iap-cert"
+    external-dns.alpha.kubernetes.io/hostname: "iap.gcp-wescale.slavayssiere.fr"
+spec:
+  backend:
+    serviceName: istio-ingressgateway
+    servicePort: 80

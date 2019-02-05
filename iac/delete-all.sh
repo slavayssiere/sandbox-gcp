@@ -27,4 +27,11 @@ cd ../functions
 ./destroy.sh
 cd -
 
-gsutil rm -r gs://assets.gcp-wescale.slavayssiere.fr
+
+ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
+
+gsutil rm -r $ASSET_DOMAIN
+
+gcloud beta compute ssl-certificates delete "gcp-wescale-asset-cert"
+
+
