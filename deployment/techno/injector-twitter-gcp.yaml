@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-injector
-        image: eu.gcr.io/slavayssiere-sandbox/twitter-injector:0.0.16
+        image: eu.gcr.io/slavayssiere-sandbox/twitter-injector:0.0.17
         imagePullPolicy: Always
         env:
         - name: TOPIC_NAME
@@ -31,6 +31,8 @@ spec:
           value: "#gcp"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-publisher.json"
+        - name: ZIPKIN_ENDPOINT
+          value: "zipkin.istio-system.svc.cluster.local"
         - name: CONSUMER_KEY
           valueFrom:
             secretKeyRef:

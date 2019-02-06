@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator-listener:0.0.1
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator-listener:0.0.2
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -31,6 +31,8 @@ spec:
           value: "/secret/sa-pubsub-datastore.json"
         - name: REDIS_HOST
           value: redis.gcp.wescale
+        - name: ZIPKIN_ENDPOINT
+          value: "zipkin.istio-system.svc.cluster.local"
         ports:
         - containerPort: 8080
           name: http

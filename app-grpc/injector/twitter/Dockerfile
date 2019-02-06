@@ -26,6 +26,7 @@ ENV CONSUMER_SECRET "default"
 ENV ACCESS_TOKEN "default"
 ENV ACCESS_SECRET "default"
 ENV HASHTAG "#CAC40"
+ENV ZIPKIN_ENDPOINT "zipkin.istio-system.svc.cluster.local"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/twitter /app/

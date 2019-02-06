@@ -18,6 +18,10 @@ import (
 	"github.com/gorilla/mux"
 
 	"context"
+
+	zipkin "github.com/openzipkin-contrib/zipkin-go-opentracing"
+
+	"github.com/opentracing/opentracing-go"
 )
 
 // LoggerMiddleware add logger and metrics
@@ -51,6 +55,7 @@ var (
 	redisaddr      = flag.String("redis-address", os.Getenv("REDIS_HOST")+":6379", "The address to listen on for HTTP requests.")
 	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "subscription for cloud scheduler")
 	pathprefix     = flag.String("path-prefix", os.Getenv("PATH_PREFIX"), "Path prefix")
+	zipkinuri      = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
 )
 
 type server struct {
@@ -69,8 +74,34 @@ func main() {
 	// Define globals
 	s.ctx = context.Background()
 
+
+	///////////////////////////////// Zipkin Connection ////////////////////////////////
+	collector, err := zipkin.NewHTTPCollector(*zipkinuri)
+	if err != nil {
+		log.Printf("unable to create Zipkin HTTP collector: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Create our recorder.
+	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "normalizer-twitter")
+
+	// Create our tracer.
+	tracer, err := zipkin.NewTracer(
+		recorder,
+		zipkin.ClientServerSameSpan(true),
+		zipkin.TraceID128Bit(true),
+	)
+	if err != nil {
+		log.Printf("unable to create Zipkin tracer: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Explicitly set our tracer to be the default tracer.
+	opentracing.InitGlobalTracer(tracer)
+
+
 	log.Println("Get secret from: " + *secretpath)
-	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
+	s.sub = s.connexionSubcriber(tracer, "pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
 	s.messages = make(chan func () (libmetier.MessageSocial, int64, int64))
 	s.timeProm = promHistogramVec()
 	s.redis = redisNew()

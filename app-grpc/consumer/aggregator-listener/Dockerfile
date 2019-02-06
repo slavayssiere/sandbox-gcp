@@ -21,6 +21,7 @@ ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
 ENV PROM_PORT 8080
 ENV REDIS_HOST "redis.gcp.wescale"
 ENV SUB_AGGREGA "aggregator-queue-sub"
+ENV ZIPKIN_ENDPOINT "zipkin.istio-system.svc.cluster.local"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/aggregator-listener /app/

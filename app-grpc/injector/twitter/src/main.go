@@ -13,6 +13,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
+
+	zipkin "github.com/openzipkin-contrib/zipkin-go-opentracing"
+
+	"github.com/opentracing/opentracing-go"
 )
 
 var (
@@ -23,6 +27,7 @@ var (
 	accessSecret   = flag.String("access-secret", os.Getenv("ACCESS_SECRET"), "Twitter Access Secret")
 	hashtag        = flag.String("hashtag", os.Getenv("HASHTAG"), "Twitter hashtag")
 	topicname      = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "Twitter hashtag")
+	zipkinuri      = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
 )
 
 type server struct {
@@ -47,12 +52,36 @@ func main() {
 	var s server
 	var tc twitterClient
 
-	// Client
-	s.ps = s.connexionPublisher("pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
+	///////////////////////////////// Zipkin Connection ////////////////////////////////
+	collector, err := zipkin.NewHTTPCollector(*zipkinuri)
+	if err != nil {
+		log.Printf("unable to create Zipkin HTTP collector: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Create our recorder.
+	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "injector-twitter")
+
+	// Create our tracer.
+	tracer, err := zipkin.NewTracer(
+		recorder,
+		zipkin.ClientServerSameSpan(true),
+		zipkin.TraceID128Bit(true),
+	)
+	if err != nil {
+		log.Printf("unable to create Zipkin tracer: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Explicitly set our tracer to be the default tracer.
+	opentracing.InitGlobalTracer(tracer)
+
+	///////////////////////////////// Pubsub Connection ////////////////////////////////
+	s.ps = s.connexionPublisher(tracer, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 	s.publishTimeChan = make(chan int64)
 	s.streamError = make(chan bool)
 
-	//twitter
+	///////////////////////////////// Twitter Connection ////////////////////////////////
 	tc.clt = newTwitter(consumerKey, consumerSecret, accessToken, accessSecret)
 
 	// Prometheus

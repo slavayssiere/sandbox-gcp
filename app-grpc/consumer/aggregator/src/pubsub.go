@@ -11,9 +11,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
+	"github.com/opentracing/opentracing-go"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 )
 
-func (s server) connexionSubcriber(address string, filename string, scope ...string) pubsub.SubscriberClient {
+func (s server) connexionSubcriber(tracer opentracing.Tracer, address string, filename string, scope ...string) pubsub.SubscriberClient {
 	pool, _ := x509.SystemCertPool()
 	// error handling omitted
 	creds := credentials.NewClientTLSFromCert(pool, "")
@@ -22,6 +24,8 @@ func (s server) connexionSubcriber(address string, filename string, scope ...str
 		"pubsub.googleapis.com:443",
 		grpc.WithTransportCredentials(creds),
 		grpc.WithPerRPCCredentials(perRPC),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(tracer)),
+		grpc.WithStreamInterceptor(otgrpc.OpenTracingStreamClientInterceptor(tracer)),
 	)
 
 	return pubsub.NewSubscriberClient(conn)

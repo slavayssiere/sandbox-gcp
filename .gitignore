@@ -20,3 +20,4 @@ app-grpc/consumer/aggregator/src/aggregator
 iac/layer-services/istio-1.0.*
 iac/layer-istio-lb-http/.terraform
 iac/sa-sse.json
+app-grpc/normalizer/twitter/src/twitter

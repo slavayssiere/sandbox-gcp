@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-ds
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.22
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.23
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -35,6 +35,8 @@ spec:
           value: redis.gcp.wescale
         - name: PATH_PREFIX
           value: "/aggregator"
+        - name: ZIPKIN_ENDPOINT
+          value: "zipkin.istio-system.svc.cluster.local"
         ports:
         - containerPort: 8080
           name: http
