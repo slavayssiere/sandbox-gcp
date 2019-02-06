@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.19
+        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.20
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -94,9 +94,11 @@ metadata:
 spec:
   hosts:
   - "public.gcp-wescale.slavayssiere.fr"
+  - "iap.gcp-wescale.slavayssiere.fr"
   gateways:
   - consumers-gateway
   http:
   - route:
     - destination:
         host: app-sse-svc
+    websocketUpgrade: true

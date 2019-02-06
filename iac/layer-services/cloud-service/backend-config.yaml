@@ -2,6 +2,7 @@ apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
 metadata:
   name: config-default
+  namespace: istio-system
 spec:
   iap:
     enabled: true

@@ -10,4 +10,15 @@ metadata:
 spec:
   backend:
     serviceName: istio-ingressgateway
-    servicePort: 80
+    servicePort: http2
+  rules:
+  - http:
+      paths:
+      - path: /aggregator
+        backend:
+          serviceName: istio-ingressgateway
+          servicePort: http2
+      - path: /events
+        backend:
+          serviceName: istio-ingressgateway
+          servicePort: http2

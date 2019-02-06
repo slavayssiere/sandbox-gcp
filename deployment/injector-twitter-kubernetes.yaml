@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: injector-twitter-gilletsjaunes-deploy
+  name: injector-twitter-kubernetes-deploy
   namespace: injectors
   labels:
-    app: injector-twitter-gilletsjaunes-deploy
+    app: injector-twitter-kubernetes-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: injector-twitter-gilletsjaunes-deploy
+      app: injector-twitter-kubernetes-deploy
   template:
     metadata:
       labels:
-        app: injector-twitter-gilletsjaunes-deploy
+        app: injector-twitter-kubernetes-deploy
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/injector: 'true'
@@ -28,7 +28,7 @@ spec:
         - name: TOPIC_NAME
           value: "projects/slavayssiere-sandbox/topics/twitter-raw"
         - name: HASHTAG
-          value: "#GiletsJaunes"
+          value: "#kubernetes"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-publisher.json"
         - name: CONSUMER_KEY

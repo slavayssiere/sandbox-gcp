@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: injector-twitter-other-deploy
+  name: injector-twitter-gcp-deploy
   namespace: injectors
   labels:
-    app: injector-twitter-other-deploy
+    app: injector-twitter-gcp-deploy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: injector-twitter-other-deploy
+      app: injector-twitter-gcp-deploy
   template:
     metadata:
       labels:
-        app: injector-twitter-other-deploy
+        app: injector-twitter-gcp-deploy
       annotations:
         prometheus.io/scrape: 'true'
         prometheus.io/injector: 'true'
@@ -28,7 +28,7 @@ spec:
         - name: TOPIC_NAME
           value: "projects/slavayssiere-sandbox/topics/twitter-raw"
         - name: HASHTAG
-          value: "#BlueMonday"
+          value: "#gcp"
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-publisher.json"
         - name: CONSUMER_KEY

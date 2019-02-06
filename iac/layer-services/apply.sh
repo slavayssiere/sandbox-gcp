@@ -20,7 +20,7 @@ helm init  --service-account tiller
 
 # configure cloud IAP
 source ../../env.sh
-kubectl create secret generic my-oauth-secret \
+kubectl -n istio-system create secret generic my-oauth-secret \
 	--from-literal=client_id=$CLIENT_ID \
     --from-literal=client_secret=$CLIENT_SECRET
 kubectl apply -f cloud-service/backend-config.yaml

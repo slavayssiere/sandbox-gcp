@@ -227,9 +227,9 @@ gateways:
     labels:
       app: istio-ingressgateway
       istio: ingressgateway
-    replicaCount: 1
-    autoscaleMin: 1
-    autoscaleMax: 5
+    replicaCount: 3
+    autoscaleMin: 3
+    autoscaleMax: 6
     resources: {}
       # limits:
       #  cpu: 100m
@@ -242,7 +242,7 @@ gateways:
     loadBalancerIP: ""
     serviceAnnotations: 
       external-dns.alpha.kubernetes.io/hostname: public.gcp-wescale.slavayssiere.fr
-      beta.cloud.google.com/backend-config: '{"default": "config-default"}'
+      beta.cloud.google.com/backend-config: '{"ports": {"http2" :"config-default"}, "default": "config-default"}'
     type: LoadBalancer #change to NodePort, ClusterIP or LoadBalancer if need be
     # Uncomment the following line to preserve client source ip.
     externalTrafficPolicy: Local
@@ -359,9 +359,9 @@ gateways:
     labels:
       app: admin-ingressgateway
       istio: admin-ingressgateway
-    replicaCount: 1
-    autoscaleMin: 1
-    autoscaleMax: 5
+    replicaCount: 3
+    autoscaleMin: 3
+    autoscaleMax: 6
     resources: {}
       # limits:
       #  cpu: 100m

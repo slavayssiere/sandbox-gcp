@@ -66,6 +66,8 @@ curl -X GET https://us-central1-slavayssiere-sandbox.cloudfunctions.net/getstat?
 curl -X GET http://public.gcp-wescale.slavayssiere.fr/aggregator/top10 | jq .
 ```
 
+curl -vvv --header "Authorization: Bearer $TOKEN" https://iap.gcp-wescale.slavayssiere.fr/
+
 #### To test datavisualisation
 
 Aller sur Google Drive

@@ -100,6 +100,7 @@ metadata:
 spec:
   hosts:
   - "public.gcp-wescale.slavayssiere.fr"
+  - "iap.gcp-wescale.slavayssiere.fr"
   gateways:
   - consumers-gateway
   http:
