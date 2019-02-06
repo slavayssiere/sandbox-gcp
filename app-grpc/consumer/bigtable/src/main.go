@@ -13,6 +13,10 @@ import (
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 
 	"context"
+
+	zipkin "github.com/openzipkin-contrib/zipkin-go-opentracing"
+
+	"github.com/opentracing/opentracing-go"
 )
 
 var (
@@ -24,6 +28,7 @@ var (
 	subname        = flag.String("sub-name", os.Getenv("SUB_NAME"), "Twitter hashtag")
 	secretpath     = flag.String("secret-path", os.Getenv("SECRET_PATH"), "Twitter hashtag")
 	aggregasub     = flag.String("aggrega-sub", os.Getenv("SUB_AGGREGA"), "subscription for cloud scheduler")
+	zipkinuri      = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
 )
 
 type server struct {
@@ -41,8 +46,33 @@ func main() {
 	// Define globals
 	ctx := context.Background()
 
+
+	///////////////////////////////// Zipkin Connection ////////////////////////////////
+	collector, err := zipkin.NewHTTPCollector(*zipkinuri)
+	if err != nil {
+		log.Printf("unable to create Zipkin HTTP collector: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Create our recorder.
+	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "normalizer-twitter")
+
+	// Create our tracer.
+	tracer, err := zipkin.NewTracer(
+		recorder,
+		zipkin.ClientServerSameSpan(true),
+		zipkin.TraceID128Bit(true),
+	)
+	if err != nil {
+		log.Printf("unable to create Zipkin tracer: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Explicitly set our tracer to be the default tracer.
+	opentracing.InitGlobalTracer(tracer)
+
 	log.Println("Get secret from: " + *secretpath)
-	s.sub = s.connexionSubcriber("pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
+	s.sub = s.connexionSubcriber(tracer, "pubsub.googleapis.com:443", *secretpath, "https://www.googleapis.com/auth/pubsub")
 	s.bt = bigtableClient(ctx)
 	s.messages = make(chan libmetier.MessageSocial)
 	s.timeProm = promHistogramVec()

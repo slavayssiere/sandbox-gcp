@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: my-bt
-        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.14
+        image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.15
         imagePullPolicy: Always
         env:
         - name: SUB_NAME 
@@ -37,6 +37,8 @@ spec:
           value: "test-instance"
         - name: SUB_AGGREGA 
           value: "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub-dataset"
+        - name: ZIPKIN_ENDPOINT
+          value: "zipkin.istio-system.svc.cluster.local"
         ports:
         - containerPort: 8080
           name: http

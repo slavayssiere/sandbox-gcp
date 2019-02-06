@@ -23,6 +23,7 @@ ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/messages-normalized-su
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
 ENV SUB_AGGREGA "projects/slavayssiere-sandbox/subscriptions/aggregator-queue-sub-dataset"
 ENV PROM_PORT 8080
+ENV ZIPKIN_ENDPOINT "zipkin.istio-system.svc.cluster.local"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/bigtable /app/
