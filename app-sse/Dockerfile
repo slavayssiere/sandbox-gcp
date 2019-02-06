@@ -18,6 +18,7 @@ RUN apk add --no-cache curl ca-certificates
 VOLUME /secrets
 ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/test-sub"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
+ENV ZIPKIN_ENDPOINT "zipkin.istio-system.svc.cluster.local"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/app-sse /app/

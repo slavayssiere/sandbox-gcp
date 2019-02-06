@@ -18,6 +18,10 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
+
+	zipkin "github.com/openzipkin-contrib/zipkin-go-opentracing"
+
+	"github.com/opentracing/opentracing-go"
 )
 
 type server struct {
@@ -31,6 +35,7 @@ type server struct {
 
 var (
 	topicName = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "the pubsub subscription")
+	zipkinuri = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
 	message   pubsub.PubsubMessage
 )
 
@@ -46,12 +51,37 @@ func main() {
 
 	s.ctx = context.Background()
 
+	///////////////////////////////// Zipkin Connection ////////////////////////////////
+	collector, err := zipkin.NewHTTPCollector(*zipkinuri)
+	if err != nil {
+		log.Printf("unable to create Zipkin HTTP collector: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Create our recorder.
+	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "app-sse")
+
+	// Create our tracer.
+	tracer, err := zipkin.NewTracer(
+		recorder,
+		zipkin.ClientServerSameSpan(true),
+		zipkin.TraceID128Bit(true),
+	)
+	if err != nil {
+		log.Printf("unable to create Zipkin tracer: %+v\n", err)
+		os.Exit(-1)
+	}
+
+	// Explicitly set our tracer to be the default tracer.
+	opentracing.InitGlobalTracer(tracer)
+
+
 	sha256 := sha256.Sum256([]byte(time.Now().Format(time.RFC1123)))
 
 	s.sub = fmt.Sprintf("projects/slavayssiere-sandbox/subscriptions/app-sse-subcription-%x", sha256)
 
 	// Sub client
-	s.clt = connexionSubcriber(s.ctx, s.sub, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
+	s.clt = connexionSubcriber(s.ctx, tracer, s.sub, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 
 	s.timeSSE = promHistogramVec()
 

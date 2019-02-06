@@ -12,9 +12,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
+	"github.com/opentracing/opentracing-go"
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 )
 
-func connexionSubcriber(ctx context.Context, subname string, address string, filename string, scope ...string) pubsub.SubscriberClient {
+func connexionSubcriber(ctx context.Context, tracer opentracing.Tracer, subname string, address string, filename string, scope ...string) pubsub.SubscriberClient {
 	pool, err := x509.SystemCertPool()
 	if err != nil {
 		log.Println(err)
@@ -30,6 +32,8 @@ func connexionSubcriber(ctx context.Context, subname string, address string, fil
 		"pubsub.googleapis.com:443",
 		grpc.WithTransportCredentials(creds),
 		grpc.WithPerRPCCredentials(perRPC),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(tracer)),
+		grpc.WithStreamInterceptor(otgrpc.OpenTracingStreamClientInterceptor(tracer)),
 	)
 	if err != nil {
 		log.Println(err)
