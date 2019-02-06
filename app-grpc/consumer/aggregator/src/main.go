@@ -84,7 +84,7 @@ func main() {
 	}
 
 	// Create our recorder.
-	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "normalizer-twitter")
+	recorder := zipkin.NewRecorder(collector, false, "0.0.0.0:8080", "aggregator")
 
 	// Create our tracer.
 	tracer, err := zipkin.NewTracer(
