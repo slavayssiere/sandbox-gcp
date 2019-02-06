@@ -42,3 +42,6 @@ gsutil web set -m index.html -e 404.html gs://$ASSET_DOMAIN
 
 #gcloud beta compute ssl-certificates create "gcp-wescale-asset-cert" --domains $ASSET_DOMAIN
 
+cd ../deployment
+./deploy.sh
+cd -
