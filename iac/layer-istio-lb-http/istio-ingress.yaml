@@ -6,19 +6,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.global-static-ip-name: "istio-lb-http"
     ingress.gcp.kubernetes.io/pre-shared-cert: "gcp-wescale-iap-cert"
-    external-dns.alpha.kubernetes.io/hostname: "iap.gcp-wescale.slavayssiere.fr"
 spec:
   backend:
     serviceName: istio-ingressgateway
     servicePort: http2
-  rules:
-  - http:
-      paths:
-      - path: /aggregator
-        backend:
-          serviceName: istio-ingressgateway
-          servicePort: http2
-      - path: /events
-        backend:
-          serviceName: istio-ingressgateway
-          servicePort: http2

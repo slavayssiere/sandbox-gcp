@@ -34,7 +34,7 @@ spec:
         - name: LANGUAGE
           value: "false"
         - name: ZIPKIN_ENDPOINT
-          value: "zipkin.istio-system.svc.cluster.local"
+          value: "http://jaeger-collector.istio-system.svc.cluster.local:14268/api/traces"
         ports:
         - containerPort: 8080
         resources:

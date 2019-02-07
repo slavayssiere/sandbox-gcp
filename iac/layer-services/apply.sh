@@ -18,14 +18,6 @@ kubectl create clusterrolebinding cluster-admin-binding --clusterrole=cluster-ad
 kubectl apply -f helm/rbac.yaml
 helm init  --service-account tiller
 
-# configure cloud IAP
-source ../../env.sh
-kubectl -n istio-system create secret generic my-oauth-secret \
-	--from-literal=client_id=$CLIENT_ID \
-    --from-literal=client_secret=$CLIENT_SECRET
-kubectl apply -f cloud-service/backend-config.yaml
-
-
 test_tiller=$(test_tiller_present)
 while [ $test_tiller -lt 1 ]; do
     echo "Wait for Tiller: $test_tiller"
@@ -69,7 +61,18 @@ cd istio-1.0.5
     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio-1.0.5.yaml
 cd -
 
+kubectl -n istio-system annotate svc istio-ingressgateway beta.cloud.google.com/backend-config="{\"ports\": {\"http2\" :\"config-default\"}, \"default\": \"config-default\"}" --overwrite=true
+
+# configure cloud IAP
+source ../../env.sh
+kubectl -n istio-system create secret generic my-oauth-secret \
+	--from-literal=client_id=$CLIENT_ID \
+    --from-literal=client_secret=$CLIENT_SECRET
+kubectl apply -f cloud-service/backend-config.yaml
+
 apply_kubectl "monitoring"
+
+
 
 ## delete istio CRD
 # kubectl delete customresourcedefinitions $(kubectl get customresourcedefinitions | cut -d ' ' -f1 | grep istio.io)

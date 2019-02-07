@@ -30,8 +30,8 @@ cd ../functions
 ./apply.sh
 cd -
 
-# ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
-ASSET_DOMAIN="test-asset-bucket"
+ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
+# ASSET_DOMAIN="test-asset-bucket"
 
 gsutil mb gs://$ASSET_DOMAIN
 
