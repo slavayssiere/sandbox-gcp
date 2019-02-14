@@ -31,12 +31,14 @@ type server struct {
 	b        *Broker
 	sub      string
 	ctx      context.Context
+	pub      pubsub.PublisherClient
 }
 
 var (
-	topicName = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "the pubsub subscription")
-	zipkinuri = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
-	message   pubsub.PubsubMessage
+	topicName   = flag.String("topic-name", os.Getenv("TOPIC_NAME"), "the pubsub subscription")
+	publictopic = flag.String("public-topic-name", os.Getenv("PUBLIC_TOPIC_NAME"), "the pubsub subscription")
+	zipkinuri   = flag.String("zipkin-endpoint", os.Getenv("ZIPKIN_ENDPOINT"), "Zipkin endpoint")
+	message     pubsub.PubsubMessage
 )
 
 func init() {
@@ -75,13 +77,13 @@ func main() {
 	// Explicitly set our tracer to be the default tracer.
 	opentracing.InitGlobalTracer(tracer)
 
-
 	sha256 := sha256.Sum256([]byte(time.Now().Format(time.RFC1123)))
 
 	s.sub = fmt.Sprintf("projects/slavayssiere-sandbox/subscriptions/app-sse-subcription-%x", sha256)
 
 	// Sub client
 	s.clt = connexionSubcriber(s.ctx, tracer, s.sub, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
+	s.pub = connexionPublisher(s.ctx, tracer, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
 
 	s.timeSSE = promHistogramVec()
 
@@ -134,6 +136,7 @@ func main() {
 	}()
 
 	http.Handle("/", http.HandlerFunc(handler))
+	http.Handle("/displayevent", http.HandlerFunc(s.handlerDisplayEvent))
 	http.Handle("/events/", s.b)
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("launch server")

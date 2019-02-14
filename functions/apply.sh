@@ -3,7 +3,7 @@
 GCP_PROJECT="slavayssiere-sandbox"
 
 gcloud iam service-accounts create "sa-cloudfunction" --display-name "SA for bastion"
-gcloud -q projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner
+gcloud -q projects add-iam-policy-binding $GCP_PROJECT --member serviceAccount:sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com --role roles/datastore.owner >> /dev/null
 
 #gcloud iam service-accounts add-iam-policy-binding service-500721978414@gcf-admin-robot.iam.gserviceaccount.com --member= --role=roles/iam.serviceAccountUser
 

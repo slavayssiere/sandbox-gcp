@@ -5,6 +5,10 @@ echo "Destroy dataset..."
 ./destroy.sh
 cd -
 
+cd layer-istio-lb-http
+./destroy.sh
+cd -
+
 cd layer-bastion
 terraform destroy \
     -auto-approve
@@ -26,7 +30,6 @@ cd -
 cd ../functions
 ./destroy.sh
 cd -
-
 
 ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
 

@@ -30,6 +30,10 @@ cd ../functions
 ./apply.sh
 cd -
 
+cd layer-istio-lb-http
+./apply.sh
+cd -
+
 ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
 # ASSET_DOMAIN="test-asset-bucket"
 

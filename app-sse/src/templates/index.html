@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <title>App SSE - MessageSocial</title>
+    <title>WeScale live Flux</title>
+    <link rel="icon" href="https://www.wescale.fr/images/favicon.ico" />
 </head>
 <style>
 h1 {
@@ -14,6 +15,12 @@ h1 {
     border-top-width: 10px;
     padding-top: 10px;
     padding-left: 20px;
+    font-family: 'Open Sans Condensed', sans-serif;
+    line-height: 20px;
+    font-size: 40px;
+    font-weight: bold;
+    color: white;
+    text-transform: uppercase;
 }
 #fleet-1 {
     padding-bottom: 10px;
@@ -29,16 +36,22 @@ h1 {
     padding-left: 20px;
 }
 
-
 #fleet-3 {
     padding-bottom: 10px;
     border-top-width: 10px;
     padding-top: 10px;
     padding-left: 20px;
 }
+
+#common {
+    background-image: url(https://www.wescale.fr/images/bg-sun-cloud-head.jpg);
+    /* background-repeat: no-repeat; */
+    background-position: center center;
+    background-size: cover;
+}
 </style>
-<body>
-    <h1><img src="https://www.wescale.fr/images/logo.png" style="padding-right: 20px;">Live Messages Sociaux</h1>
+<body id="common">
+    <h1><img src="https://www.wescale.fr/images/logo.png" style="padding-right: 20px;">Live Flux</h1>
 
     <div class="row">
         <div class="col-md-4" id="fleet-1"></div>
@@ -48,6 +61,16 @@ h1 {
 
 
     <script type="text/javascript">
+
+        var datas = [];
+
+        function postAdmin(num){
+            console.log(datas[num])
+            var div = document.getElementById('data-'+num);
+            div.hidden = true
+        }
+
+
         // Create a new HTML5 EventSource
         var nb = 1;
         if (!!window.EventSource) {
@@ -69,8 +92,8 @@ h1 {
             // {"data":"...","user":"lagrost anne","source":"twitter","tag":"#GiletsJaunes","timestamp":"2019-01-30T16:17:37.206025277Z","sentiment":0,"id":"1090645193970339843"}
             source.addEventListener('message', function(e) {
                 var data = JSON.parse(e.data);
-                var src 
-                console.log(data.source);
+                numdata = datas.push(data)
+                var src
                 if (data.source === 'twitter') {
                     src = '<img src="http://assets.gcp-wescale.slavayssiere.fr/twitter.png" height="20px" />'
                 } else {
@@ -82,12 +105,13 @@ h1 {
                     nb = 1;
                 }
                 var tmp = fleetDiv.innerHTML
-                fleetDiv.innerHTML = '<div class="card text-white bg-primary mb-3">' 
+                fleetDiv.innerHTML = '<div id="data-'+numdata+'" class="card text-white bg-primary mb-3">' 
                     + '<div class="card-header">' + src + ' / ' + data.tag + '</div>'
                     + '<div class="card-body">'
                     + '<h5 class="card-title">' + data.user + '</h5>'
                     + '<p class="card-text">' + data.data + '</p>'
                     + '</div>'
+                    + '<button type="button" class="btn btn-warning" onclick="postAdmin('+ numdata +')">Publish this one</button>'
                     + '</div>' + tmp;
             }, false);
 

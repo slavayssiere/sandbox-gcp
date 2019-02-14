@@ -11,7 +11,7 @@ spec:
       issuer: "https://cloud.google.com/iap"
       jwksUri: "https://www.gstatic.com/iap/verify/public_key-jwk"
       audiences: 
-      - "/projects/500721978414/global/backendServices/3032402820485714702"
+      - "/projects/500721978414/global/backendServices/2507138456305109964"
       jwt_headers: 
       - "x-goog-iap-jwt-assertion"
   principalBinding: USE_ORIGIN

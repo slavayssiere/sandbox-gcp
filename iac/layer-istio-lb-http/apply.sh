@@ -2,21 +2,21 @@
 
 source ../../env.sh
 
-IAP_DOMAIN="iap.gcp-wescale.slavayssiere.fr"
-
 terraform apply -auto-approve
-
-#gcloud compute addresses create istio-lb-http --global
-# gcloud beta compute ssl-certificates create "gcp-wescale-iap-cert" --domains $IAP_DOMAIN
 
 kubectl apply -f istio-ingress.yaml
 
-sleep 20
+until (gcloud compute health-checks list | grep k8s)
+do
+    echo "Wait for healthcheck..."
+    sleep 10
+done
 
 hcistio=$(gcloud compute health-checks list | grep k8s | cut -d ' ' -f1)
 prevhc=$(gcloud compute health-checks list | grep HTTP | grep -v k8s-be | cut -d ' ' -f1)
 port=$(gcloud compute health-checks describe $prevhc --format="value(httpHealthCheck.port)")
 
+echo "change health for '$hcistio' on port: $port "
 gcloud compute health-checks update http $hcistio --request-path=/healthz --port=$port 
 
 id_service=$(gcloud compute backend-services describe $hcistio --global --format="value(id)")

@@ -16,14 +16,14 @@ RUN go install
 FROM alpine
 RUN apk add --no-cache curl ca-certificates
 VOLUME /secrets
-ENV SUB_NAME "projects/slavayssiere-sandbox/subscriptions/test-sub"
+ENV TOPIC_NAME "projects/slavayssiere-sandbox/topic/test-sub"
 ENV SECRET_PATH "/secret/secret-sa-gcp-pubsub.json"
 ENV ZIPKIN_ENDPOINT "zipkin.istio-system.svc.cluster.local"
+ENV PUBLIC_TOPIC_NAME "projects/slavayssiere-sandbox/topic/test-sub"
 
 WORKDIR /app
 COPY --from=build-stage /go/bin/app-sse /app/
 COPY src/templates/index.html templates/index.html
-COPY src/templates/twitter.png templates/twitter.png
 HEALTHCHECK --interval=5s --retries=3 --timeout=5s CMD curl -f http://localhost:8080/healthz || exit 1
 ENTRYPOINT ./app-sse
 EXPOSE 8080
