@@ -64,7 +64,7 @@ h1 {
         // Create a new HTML5 EventSource
         var nb = 1;
         if (!!window.EventSource) {
-            var source = new EventSource('/events/');
+            var source = new EventSource('/eventspublic/');
             // Create a callback for when a new message is received.
             // source.onmessage = function(e) {
             //     // Append the `data` attribute of the message to the DOM.

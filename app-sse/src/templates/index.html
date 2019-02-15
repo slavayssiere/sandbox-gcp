@@ -65,9 +65,17 @@ h1 {
         var datas = [];
 
         function postAdmin(num){
-            console.log(datas[num])
+            console.log(JSON.stringify(datas[num]))
             var div = document.getElementById('data-'+num);
             div.hidden = true
+
+            fetch("/displayevent", {
+                method: "POST",
+                body: JSON.stringify(datas[num]),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
         }
 
 

@@ -23,7 +23,8 @@ import (
 )
 
 var (
-	// input = flag.String("input", "gs://apache-beam-samples/shakespeare/kinglear.txt", "File(s) to read.")
+	inputtype = flag.String("input-type", "text", "File(s) to read.")
+	input = flag.String("input", "gs://apache-beam-samples/shakespeare/kinglear.txt", "File(s) to read.")
 	output = flag.String("output", "gs://result-dataproc-bucket/count", "Output file (required).")
 	topic = flag.String("topic", "messages-normalized", "File(s) to read.")
 	subscription = flag.String("subscription", "messages-normalized-sub-dataproc", "File(s) to read.")
@@ -104,14 +105,18 @@ func main() {
 	p := beam.NewPipeline()
 	s := p.Root()
 
-	//lines := textio.Read(s, *input)
-	project := gcpopts.GetProject(ctx)
-	msg := pubsubio.Read(s, project, *topic, &pubsubio.ReadOptions{
-		Subscription: *subscription,
-	})
-
-	str := beam.ParDo(s, stringx.FromBytes, msg)
-	counted := CountWords(s, str)
+	var lines beam.PCollection
+	if strings.Compare(*inputtype, "text") == 0 {
+		lines = textio.Read(s, *input)
+	} else {
+		project := gcpopts.GetProject(ctx)
+		msg := pubsubio.Read(s, project, *topic, &pubsubio.ReadOptions{
+			Subscription: *subscription,
+		})
+		lines = beam.ParDo(s, stringx.FromBytes, msg)
+	}
+	
+	counted := CountWords(s, lines)
 	formatted := beam.ParDo(s, formatFn, counted)
 	//cap := beam.ParDo(s, strings.ToUpper, str)
 	//debug.Print(s, cap)

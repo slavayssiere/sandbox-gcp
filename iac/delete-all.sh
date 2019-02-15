@@ -35,6 +35,4 @@ ASSET_DOMAIN="assets.gcp-wescale.slavayssiere.fr"
 
 gsutil rm -r gs://$ASSET_DOMAIN
 
-gcloud -q beta compute ssl-certificates delete "gcp-wescale-asset-cert"
-
 gsutil rm -r gs://tf-slavayssiere-wescale/terraform

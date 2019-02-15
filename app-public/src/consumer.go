@@ -92,12 +92,13 @@ func (s server) messagesreceive(resp *pubsub.PullResponse, pull pubsub.PullReque
 }
 
 func (s server) msgreceive(msg *pubsub.PubsubMessage) {
-
+	log.Println(msg.Data)
 	var ms libmetier.MessageSocial
 	err := json.Unmarshal(msg.Data, &ms)
 	if err != nil {
 		log.Println(err)
 	} else {
+		log.Println(ms)
 		s.messages <- ms
 	}
 }

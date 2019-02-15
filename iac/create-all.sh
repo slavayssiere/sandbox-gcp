@@ -26,10 +26,6 @@ cd ../visualizer
 ./apply.sh
 cd -
 
-cd ../functions
-./apply.sh
-cd -
-
 cd layer-istio-lb-http
 ./apply.sh
 cd -
@@ -44,8 +40,10 @@ gsutil cp ../app-sse/src/templates/twitter.png gs://$ASSET_DOMAIN
 gsutil iam ch allUsers:objectViewer gs://$ASSET_DOMAIN
 gsutil web set -m index.html -e 404.html gs://$ASSET_DOMAIN
 
-#gcloud beta compute ssl-certificates create "gcp-wescale-asset-cert" --domains $ASSET_DOMAIN
-
 cd ../deployment
 ./deploy.sh
+cd -
+
+cd ../functions
+./apply.sh
 cd -

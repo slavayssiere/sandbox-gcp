@@ -1,13 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
-	"time"
+
+	"github.com/slavayssiere/sandbox-gcp/app-grpc/libmetier"
 
 	pubsub "google.golang.org/genproto/googleapis/pubsub/v1beta2"
 )
@@ -32,14 +33,22 @@ func (s server) handlerDisplayEvent(w http.ResponseWriter, r *http.Request) {
 				http.StatusInternalServerError)
 		}
 
-		var message pubsub.PubsubMessage
-		message.Data = body
-		message.Attributes = make(map[string]string)
-		message.Attributes["publish_time"] = strconv.FormatInt(time.Now().UnixNano(), 10)
+		var ms libmetier.MessageSocial
+		err = json.Unmarshal(body, &ms)
+		if err != nil {
+			log.Printf("parse error")
+			log.Println(err)
+		} else {
+			var message pubsub.PubsubMessage
+			b, err := json.Marshal(ms)
+			if err != nil {
+				log.Println(err)
+			}
+			message.Data = []byte(b)
 
-		s.publishmessage(&message)
-
-		log.Printf("POST done")
+			s.publishmessage(&message)
+			log.Printf("POST done")
+		}
 	} else {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 	}

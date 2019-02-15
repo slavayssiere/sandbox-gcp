@@ -134,7 +134,7 @@ func main() {
 	}()
 
 	http.Handle("/", http.HandlerFunc(handler))
-	http.Handle("/events/", s.b)
+	http.Handle("/eventspublic/", s.b)
 	http.Handle("/metrics", promhttp.Handler())
 	log.Println("launch server")
 	log.Fatal(http.ListenAndServe(":8080", nil))

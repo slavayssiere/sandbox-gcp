@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: eu.gcr.io/slavayssiere-sandbox/app-public:0.0.1
+        image: eu.gcr.io/slavayssiere-sandbox/app-public:0.0.3
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
@@ -31,7 +31,7 @@ spec:
         - name: TOPIC_NAME 
           value: "projects/slavayssiere-sandbox/topics/messages-public"
         - name: SECRET_PATH
-          value: "/secret/sa-public.json"
+          value: "/secret/sa-sse.json"
         - name: ZIPKIN_ENDPOINT
           value: "http://jaeger-collector.istio-system.svc.cluster.local:14268/api/traces"
         resources:
@@ -49,9 +49,9 @@ spec:
       volumes:
       - name: secret-sa
         secret:
-          secretName: sa-public
+          secretName: sa-sse
 ---
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: app-public-hpa

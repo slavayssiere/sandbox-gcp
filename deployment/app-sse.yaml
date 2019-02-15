@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.27
+        image: eu.gcr.io/slavayssiere-sandbox/app-sse:0.0.30
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
