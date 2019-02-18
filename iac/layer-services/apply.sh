@@ -61,7 +61,8 @@ cd istio-1.0.5
     helm install install/kubernetes/helm/istio --name istio --namespace istio-system -f ../istio/values-istio-1.0.5.yaml
 cd -
 
-kubectl -n istio-system annotate svc istio-ingressgateway beta.cloud.google.com/backend-config="{\"ports\": {\"http2\" :\"config-default\"}, \"default\": \"config-default\"}" --overwrite=true
+kubectl -n istio-system annotate svc iap-ingressgateway beta.cloud.google.com/backend-config="{\"ports\": {\"http2\" :\"config-iap\"}, \"default\": \"config-iap\"}" --overwrite=true
+kubectl -n istio-system annotate svc public-ingressgateway beta.cloud.google.com/backend-config="{\"ports\": {\"http2\" :\"config-default\"}, \"default\": \"config-default\"}" --overwrite=true
 
 # configure cloud IAP
 source ../../env.sh

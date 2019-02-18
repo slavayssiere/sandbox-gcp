@@ -12,24 +12,25 @@ do
     sleep 10
 done
 
-hcistio=$(gcloud compute health-checks list | grep k8s | cut -d ' ' -f1)
-prevhc=$(gcloud compute health-checks list | grep HTTP | grep -v k8s-be | cut -d ' ' -f1)
-port=$(gcloud compute health-checks describe $prevhc --format="value(httpHealthCheck.port)")
+hcs=$(gcloud compute health-checks list --protocol=HTTP | grep k8s | cut -d ' ' -f1)
+porthc=$(kubectl -n istio-system get svc admin-ingressgateway -o jsonpath='{.spec.healthCheckNodePort}')
 
-echo "change health for '$hcistio' on port: $port "
-gcloud compute health-checks update http $hcistio --request-path=/healthz --port=$port 
+while read -r line; do   
+    echo "change health for '$line' on port: $porthc "
+    gcloud compute health-checks update http $line --request-path=/healthz --port=$porthc
+    # id_service=$(gcloud compute backend-services describe $hcistio --global --format="value(id)")
+done <<< "$hcs"
 
-id_service=$(gcloud compute backend-services describe $hcistio --global --format="value(id)")
 
-audience="$IAP_AUDIENCE$id_service"
+# audience="$IAP_AUDIENCE$id_service"
 
-cp policy.yaml policy-audience.yaml
-sed -i.bak "s/IAP_AUDIENCE/$audience/g" policy-audience.yaml
+# cp policy.yaml policy-audience.yaml
+# sed -i.bak "s/IAP_AUDIENCE/$audience/g" policy-audience.yaml
 
-# kubectl apply -f policy-audience.yaml
+# # kubectl apply -f policy-audience.yaml
 
-# rm policy-audience.yaml
-rm policy-audience.yaml.bak
+# # rm policy-audience.yaml
+# rm policy-audience.yaml.bak
 
 #ASSET_DOMAIN="test-asset-bucket"
 #gcloud compute backend-buckets create backend-asset-bucket --gcs-bucket-name=$ASSET_DOMAIN

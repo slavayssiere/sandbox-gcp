@@ -101,10 +101,9 @@ metadata:
   namespace: consumers
 spec:
   hosts:
-  - "public.gcp-wescale.slavayssiere.fr"
   - "iap.gcp-wescale.slavayssiere.fr"
   gateways:
-  - consumers-gateway
+  - consumers-gateway-iap
   http:
   - match:
     - uri:

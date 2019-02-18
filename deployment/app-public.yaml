@@ -90,7 +90,7 @@ spec:
   hosts:
   - "public.gcp-wescale.slavayssiere.fr"
   gateways:
-  - consumers-gateway
+  - consumers-gateway-public
   http:
   - route:
     - destination:

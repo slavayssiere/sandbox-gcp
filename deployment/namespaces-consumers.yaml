@@ -8,12 +8,31 @@ metadata:
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: consumers-gateway
+  name: consumers-gateway-iap
   app: consumers
   namespace: consumers
 spec:
   selector:
     istio: ingressgateway # use istio default controller
+    app: iap-ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "iap.gcp-wescale.slavayssiere.fr"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: consumers-gateway-public
+  app: consumers
+  namespace: consumers
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+    app: public-ingressgateway
   servers:
   - port:
       number: 80
@@ -21,7 +40,6 @@ spec:
       protocol: HTTP
     hosts:
     - "public.gcp-wescale.slavayssiere.fr"
-    - "iap.gcp-wescale.slavayssiere.fr"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: ServiceEntry

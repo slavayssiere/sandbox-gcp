@@ -92,7 +92,7 @@ spec:
   hosts:
   - "iap.gcp-wescale.slavayssiere.fr"
   gateways:
-  - consumers-gateway
+  - consumers-gateway-iap
   http:
   - route:
     - destination:
