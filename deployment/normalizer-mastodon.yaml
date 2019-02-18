@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-normalized
         image: eu.gcr.io/slavayssiere-sandbox/mastodon-normalizer:0.0.1
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/mastodon-raw-sub"

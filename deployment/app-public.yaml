@@ -23,7 +23,7 @@ spec:
       containers:
       - name: app
         image: eu.gcr.io/slavayssiere-sandbox/app-public:0.0.3
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
           name: http

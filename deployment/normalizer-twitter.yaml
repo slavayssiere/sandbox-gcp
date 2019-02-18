@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-normalized
         image: eu.gcr.io/slavayssiere-sandbox/twitter-normalizer:0.0.12
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/twitter-raw-sub"

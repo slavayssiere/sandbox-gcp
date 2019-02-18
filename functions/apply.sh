@@ -13,6 +13,8 @@ gcloud alpha functions deploy laststat \
     --runtime go111 \
     --trigger-http \
     --service-account "sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com"
+
+   #  --region europe-west1 \
 cd -
 
 cd getstat

@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-injector
         image: eu.gcr.io/slavayssiere-sandbox/twitter-injector:0.0.17
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: TOPIC_NAME
           value: "projects/slavayssiere-sandbox/topics/twitter-raw"

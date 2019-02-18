@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-bt
         image: eu.gcr.io/slavayssiere-sandbox/consumer-bigtable:0.0.15
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-bigtable"

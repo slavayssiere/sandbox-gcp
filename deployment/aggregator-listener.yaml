@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-ds
         image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator-listener:0.0.2
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"

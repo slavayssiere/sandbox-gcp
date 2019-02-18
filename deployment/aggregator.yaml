@@ -23,7 +23,7 @@ spec:
       containers:
       - name: my-ds
         image: eu.gcr.io/slavayssiere-sandbox/consumer-aggregator:0.0.23
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
         - name: SUB_NAME 
           value: "projects/slavayssiere-sandbox/subscriptions/messages-normalized-sub-datastore"
@@ -102,8 +102,10 @@ metadata:
 spec:
   hosts:
   - "iap.gcp-wescale.slavayssiere.fr"
+  - "public.gcp-wescale.slavayssiere.fr"
   gateways:
   - consumers-gateway-iap
+  - consumers-gateway-public
   http:
   - match:
     - uri:
