@@ -78,7 +78,7 @@ func main() {
 
 	sha256 := sha256.Sum256([]byte(time.Now().Format(time.RFC1123)))
 
-	s.sub = fmt.Sprintf("projects/slavayssiere-sandbox/subscriptions/app-sse-subcription-%x", sha256)
+	s.sub = fmt.Sprintf("projects/slavayssiere-sandbox/subscriptions/app-public-subcription-%x", sha256)
 
 	// Sub client
 	s.clt = connexionSubcriber(s.ctx, tracer, s.sub, "pubsub.googleapis.com:443", os.Getenv("SECRET_PATH"), "https://www.googleapis.com/auth/pubsub")
@@ -124,6 +124,8 @@ func main() {
 	var gracefulStop = make(chan os.Signal)
 	signal.Notify(gracefulStop, syscall.SIGTERM)
 	signal.Notify(gracefulStop, syscall.SIGINT)
+	signal.Notify(gracefulStop, syscall.SIGKILL)
+	signal.Notify(gracefulStop, syscall.SIGSTOP)
 	go func() {
 		sig := <-gracefulStop
 		fmt.Printf("caught sig: %+v", sig)

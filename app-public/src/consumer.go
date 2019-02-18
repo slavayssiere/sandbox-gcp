@@ -42,6 +42,7 @@ func connexionSubcriber(ctx context.Context, tracer opentracing.Tracer, subname 
 	client := pubsub.NewSubscriberClient(conn)
 
 	//create specific subscription
+	log.Printf("create subscription: %s", subname)
 	_, err = client.CreateSubscription(ctx, &pubsub.Subscription{
 		Name:  subname,
 		Topic: *topicName,
@@ -54,6 +55,7 @@ func connexionSubcriber(ctx context.Context, tracer opentracing.Tracer, subname 
 }
 
 func (s server) closeSubscription() {
+	log.Printf("delete subscription: %s", s.sub)
 	s.clt.DeleteSubscription(s.ctx, &pubsub.DeleteSubscriptionRequest{
 		Subscription: s.sub,
 	})
