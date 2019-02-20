@@ -12,9 +12,8 @@ gcloud alpha functions deploy laststat \
     --entry-point LastStat \
     --runtime go111 \
     --trigger-http \
-    --service-account "sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com"
-
-   #  --region europe-west1 \
+    --service-account "sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com" \
+    --region europe-west1
 cd -
 
 cd getstat
@@ -22,6 +21,7 @@ gcloud alpha functions deploy getstat \
     --entry-point GetStat \
     --runtime go111 \
     --trigger-http \
-    --service-account "sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com"
+    --service-account "sa-cloudfunction@$GCP_PROJECT.iam.gserviceaccount.com" \
+    --region europe-west1
 cd -
 

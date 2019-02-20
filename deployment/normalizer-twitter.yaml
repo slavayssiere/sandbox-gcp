@@ -32,7 +32,7 @@ spec:
         - name: SECRET_PATH
           value: "/secret/sa-pubsub-full.json"
         - name: LANGUAGE
-          value: "false"
+          value: "true"
         - name: ZIPKIN_ENDPOINT
           value: "http://jaeger-collector.istio-system.svc.cluster.local:14268/api/traces"
         ports:
